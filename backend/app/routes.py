@@ -42,6 +42,12 @@ class MetricsSummaryItem(BaseModel):
     net: float
 
 
+class TopCategoryItem(BaseModel):
+    category: Category
+    operation_type: OperationType
+    total_amount: float
+
+
 def _year_for_month(month: int, today: date) -> int:
     if month < today.month:
         return today.year
@@ -167,6 +173,27 @@ def summarize_movements(
     ]
 
 
+def build_top_categories(
+    movements: list[FinancialMovement],
+    operation_type: OperationType,
+    limit: int,
+) -> list[TopCategoryItem]:
+    totals: dict[Category, float] = defaultdict(float)
+    for movement in movements:
+        if movement.operation_type == operation_type:
+            totals[movement.category] += movement.amount
+
+    ordered = sorted(totals.items(), key=lambda item: item[1], reverse=True)
+    return [
+        TopCategoryItem(
+            category=category,
+            operation_type=operation_type,
+            total_amount=round(total_amount, 2),
+        )
+        for category, total_amount in ordered[:limit]
+    ]
+
+
 @router.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
@@ -208,6 +235,23 @@ def get_metrics_summary(
         movements, start_date, end_date, category, operation_type
     )
     return summarize_movements(filtered, group_by)
+
+
+@router.get("/api/metrics/categories/top", response_model=list[TopCategoryItem])
+def get_top_categories(
+    operation_type: OperationType = Query(default="outcome"),
+    limit: int = Query(default=5, ge=1, le=20),
+    start_date: date | None = Query(default=None),
+    end_date: date | None = Query(default=None),
+    business_type: BusinessType | None = Query(default=None),
+) -> list[TopCategoryItem]:
+    movements = generate_mock_movements(seed=42)
+    if business_type is not None:
+        movements = [item for item in movements if item.business_type == business_type]
+    filtered = filter_movements(
+        movements, start_date, end_date, category=None, operation_type=operation_type
+    )
+    return build_top_categories(filtered, operation_type, limit)
 
 
 @router.get("/api/metrics/b2b", response_model=list[FinancialMovement])

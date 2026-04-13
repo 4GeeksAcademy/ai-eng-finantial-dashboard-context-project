@@ -139,3 +139,16 @@ def test_metrics_summary_by_week_honors_business_type_filter():
     assert response.status_code == 200
     payload = response.json()
     assert payload
+
+
+def test_top_categories_returns_limited_sorted_categories():
+    response = client.get(
+        "/api/metrics/categories/top",
+        params={"operation_type": "outcome", "limit": 3},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert len(payload) == 3
+    assert payload[0]["total_amount"] >= payload[1]["total_amount"]
+    assert all(item["operation_type"] == "outcome" for item in payload)
