@@ -116,3 +116,26 @@ def test_metrics_facets_returns_filter_options_and_date_range():
         "suppliers",
     ]
     assert payload["min_date"] <= payload["max_date"]
+
+
+def test_metrics_summary_by_month_returns_balances():
+    response = client.get("/api/metrics/summary", params={"group_by": "month"})
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload
+    first = payload[0]
+    assert set(first.keys()) == {"period", "income", "outcome", "net"}
+    assert all(item["income"] >= 0 for item in payload)
+    assert all(item["outcome"] >= 0 for item in payload)
+
+
+def test_metrics_summary_by_week_honors_business_type_filter():
+    response = client.get(
+        "/api/metrics/summary",
+        params={"group_by": "week", "business_type": "B2C"},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload

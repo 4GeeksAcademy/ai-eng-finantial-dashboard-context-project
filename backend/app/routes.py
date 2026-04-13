@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import random
+from collections import defaultdict
 from datetime import date
 from typing import Literal
 
@@ -11,6 +12,7 @@ OperationType = Literal["income", "outcome"]
 Category = Literal["suppliers", "sales",
                    "operational", "administrative", "others"]
 BusinessType = Literal["B2B", "B2C"]
+GroupBy = Literal["day", "week", "month"]
 
 OUTCOME_CATEGORIES = ["suppliers", "operational", "administrative", "others"]
 
@@ -31,6 +33,13 @@ class MetricsFacets(BaseModel):
     categories: list[Category]
     min_date: date
     max_date: date
+
+
+class MetricsSummaryItem(BaseModel):
+    period: str
+    income: float
+    outcome: float
+    net: float
 
 
 def _year_for_month(month: int, today: date) -> int:
@@ -129,6 +138,35 @@ def build_metrics_facets(movements: list[FinancialMovement]) -> MetricsFacets:
     )
 
 
+def summarize_movements(
+    movements: list[FinancialMovement],
+    group_by: GroupBy,
+) -> list[MetricsSummaryItem]:
+    summary_map: dict[str, dict[str, float]] = defaultdict(
+        lambda: {"income": 0.0, "outcome": 0.0}
+    )
+    for movement in movements:
+        if group_by == "day":
+            key = movement.create_date.isoformat()
+        elif group_by == "week":
+            iso_year, iso_week, _ = movement.create_date.isocalendar()
+            key = f"{iso_year}-W{iso_week:02d}"
+        else:
+            key = movement.create_date.strftime("%Y-%m")
+
+        summary_map[key][movement.operation_type] += movement.amount
+
+    return [
+        MetricsSummaryItem(
+            period=period,
+            income=round(values["income"], 2),
+            outcome=round(values["outcome"], 2),
+            net=round(values["income"] - values["outcome"], 2),
+        )
+        for period, values in sorted(summary_map.items(), key=lambda item: item[0])
+    ]
+
+
 @router.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
@@ -152,6 +190,24 @@ def get_metrics(
 def get_metrics_facets() -> MetricsFacets:
     movements = generate_mock_movements(seed=42)
     return build_metrics_facets(movements)
+
+
+@router.get("/api/metrics/summary", response_model=list[MetricsSummaryItem])
+def get_metrics_summary(
+    group_by: GroupBy = Query(default="month"),
+    start_date: date | None = Query(default=None),
+    end_date: date | None = Query(default=None),
+    category: Category | None = Query(default=None),
+    operation_type: OperationType | None = Query(default=None),
+    business_type: BusinessType | None = Query(default=None),
+) -> list[MetricsSummaryItem]:
+    movements = generate_mock_movements(seed=42)
+    if business_type is not None:
+        movements = [item for item in movements if item.business_type == business_type]
+    filtered = filter_movements(
+        movements, start_date, end_date, category, operation_type
+    )
+    return summarize_movements(filtered, group_by)
 
 
 @router.get("/api/metrics/b2b", response_model=list[FinancialMovement])
