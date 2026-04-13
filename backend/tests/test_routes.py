@@ -67,3 +67,35 @@ def test_b2c_endpoint_only_returns_b2c_records():
     assert payload
     assert all(item["business_type"] == "B2C" for item in payload)
     assert payload == sorted(payload, key=lambda item: item["create_date"])
+
+
+def test_metrics_endpoint_filters_by_category():
+    response = client.get("/api/metrics", params={"category": "sales"})
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload
+    assert all(item["category"] == "sales" for item in payload)
+
+
+def test_metrics_endpoint_filters_by_operation_type():
+    response = client.get("/api/metrics", params={"operation_type": "income"})
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload
+    assert all(item["operation_type"] == "income" for item in payload)
+
+
+def test_b2b_endpoint_combines_new_filters():
+    response = client.get(
+        "/api/metrics/b2b",
+        params={"operation_type": "outcome", "category": "suppliers"},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload
+    assert all(item["business_type"] == "B2B" for item in payload)
+    assert all(item["operation_type"] == "outcome" for item in payload)
+    assert all(item["category"] == "suppliers" for item in payload)

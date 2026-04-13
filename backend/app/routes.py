@@ -85,6 +85,27 @@ def filter_movements_by_date(
     return filtered
 
 
+def filter_movements(
+    movements: list[FinancialMovement],
+    start_date: date | None,
+    end_date: date | None,
+    category: Category | None,
+    operation_type: OperationType | None,
+) -> list[FinancialMovement]:
+    filtered = filter_movements_by_date(movements, start_date, end_date)
+    if category is not None:
+        filtered = [
+            movement for movement in filtered if movement.category == category
+        ]
+    if operation_type is not None:
+        filtered = [
+            movement
+            for movement in filtered
+            if movement.operation_type == operation_type
+        ]
+    return filtered
+
+
 def ensure_chronological_order(movements: list[FinancialMovement]) -> list[FinancialMovement]:
     return sorted(movements, key=lambda item: item.create_date)
 
@@ -98,9 +119,13 @@ def health() -> dict[str, str]:
 def get_metrics(
     start_date: date | None = Query(default=None),
     end_date: date | None = Query(default=None),
+    category: Category | None = Query(default=None),
+    operation_type: OperationType | None = Query(default=None),
 ) -> list[FinancialMovement]:
     movements = generate_mock_movements(seed=42)
-    filtered = filter_movements_by_date(movements, start_date, end_date)
+    filtered = filter_movements(
+        movements, start_date, end_date, category, operation_type
+    )
     return ensure_chronological_order(filtered)
 
 
@@ -108,11 +133,15 @@ def get_metrics(
 def get_b2b_metrics(
     start_date: date | None = Query(default=None),
     end_date: date | None = Query(default=None),
+    category: Category | None = Query(default=None),
+    operation_type: OperationType | None = Query(default=None),
 ) -> list[FinancialMovement]:
     movements = [
         movement for movement in generate_mock_movements(seed=42) if movement.business_type == "B2B"
     ]
-    filtered = filter_movements_by_date(movements, start_date, end_date)
+    filtered = filter_movements(
+        movements, start_date, end_date, category, operation_type
+    )
     return ensure_chronological_order(filtered)
 
 
@@ -120,9 +149,13 @@ def get_b2b_metrics(
 def get_b2c_metrics(
     start_date: date | None = Query(default=None),
     end_date: date | None = Query(default=None),
+    category: Category | None = Query(default=None),
+    operation_type: OperationType | None = Query(default=None),
 ) -> list[FinancialMovement]:
     movements = [
         movement for movement in generate_mock_movements(seed=42) if movement.business_type == "B2C"
     ]
-    filtered = filter_movements_by_date(movements, start_date, end_date)
+    filtered = filter_movements(
+        movements, start_date, end_date, category, operation_type
+    )
     return ensure_chronological_order(filtered)
