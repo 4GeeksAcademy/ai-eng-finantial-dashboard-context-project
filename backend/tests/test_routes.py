@@ -168,3 +168,22 @@ def test_metrics_comparison_returns_delta_fields():
         "delta_abs",
         "delta_pct",
     }
+
+
+def test_metrics_alerts_returns_anomaly_candidates():
+    response = client.get(
+        "/api/metrics/alerts",
+        params={"threshold": 0.2, "group_by": "month"},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert isinstance(payload, list)
+    if payload:
+        first = payload[0]
+        assert set(first.keys()) == {
+            "period",
+            "outcome_total",
+            "baseline_average",
+            "increase_ratio",
+        }

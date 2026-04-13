@@ -55,6 +55,13 @@ class MetricsComparison(BaseModel):
     delta_pct: float | None
 
 
+class MetricsAlert(BaseModel):
+    period: str
+    outcome_total: float
+    baseline_average: float
+    increase_ratio: float
+
+
 def _year_for_month(month: int, today: date) -> int:
     if month < today.month:
         return today.year
@@ -207,6 +214,30 @@ def calculate_net_value(movements: list[FinancialMovement]) -> float:
     return round(income - outcome, 2)
 
 
+def detect_outcome_alerts(
+    summary: list[MetricsSummaryItem],
+    threshold: float,
+) -> list[MetricsAlert]:
+    alerts: list[MetricsAlert] = []
+    historical_outcomes: list[float] = []
+    for item in summary:
+        if historical_outcomes:
+            baseline = sum(historical_outcomes) / len(historical_outcomes)
+            if baseline > 0:
+                increase_ratio = (item.outcome - baseline) / baseline
+                if increase_ratio > threshold:
+                    alerts.append(
+                        MetricsAlert(
+                            period=item.period,
+                            outcome_total=round(item.outcome, 2),
+                            baseline_average=round(baseline, 2),
+                            increase_ratio=round(increase_ratio, 4),
+                        )
+                    )
+        historical_outcomes.append(item.outcome)
+    return alerts
+
+
 @router.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
@@ -301,6 +332,25 @@ def get_metrics_comparison(
         delta_abs=delta_abs,
         delta_pct=delta_pct,
     )
+
+
+@router.get("/api/metrics/alerts", response_model=list[MetricsAlert])
+def get_metrics_alerts(
+    threshold: float = Query(default=0.3, ge=0),
+    group_by: GroupBy = Query(default="month"),
+    start_date: date | None = Query(default=None),
+    end_date: date | None = Query(default=None),
+    business_type: BusinessType | None = Query(default=None),
+) -> list[MetricsAlert]:
+    movements = generate_mock_movements(seed=42)
+    if business_type is not None:
+        movements = [item for item in movements if item.business_type == business_type]
+
+    filtered = filter_movements(
+        movements, start_date, end_date, category=None, operation_type=None
+    )
+    summary = summarize_movements(filtered, group_by)
+    return detect_outcome_alerts(summary, threshold)
 
 
 @router.get("/api/metrics/b2b", response_model=list[FinancialMovement])
