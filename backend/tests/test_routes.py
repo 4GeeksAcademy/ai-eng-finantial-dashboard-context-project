@@ -56,6 +56,7 @@ def test_b2b_endpoint_only_returns_b2b_records():
     payload = response.json()
     assert payload
     assert all(item["business_type"] == "B2B" for item in payload)
+    assert payload == sorted(payload, key=lambda item: item["create_date"])
 
 
 def test_b2c_endpoint_only_returns_b2c_records():
@@ -65,3 +66,4 @@ def test_b2c_endpoint_only_returns_b2c_records():
     payload = response.json()
     assert payload
     assert all(item["business_type"] == "B2C" for item in payload)
+    assert payload == sorted(payload, key=lambda item: item["create_date"])

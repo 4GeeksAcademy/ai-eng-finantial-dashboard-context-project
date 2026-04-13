@@ -85,6 +85,10 @@ def filter_movements_by_date(
     return filtered
 
 
+def ensure_chronological_order(movements: list[FinancialMovement]) -> list[FinancialMovement]:
+    return sorted(movements, key=lambda item: item.create_date)
+
+
 @router.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
@@ -96,7 +100,8 @@ def get_metrics(
     end_date: date | None = Query(default=None),
 ) -> list[FinancialMovement]:
     movements = generate_mock_movements(seed=42)
-    return filter_movements_by_date(movements, start_date, end_date)
+    filtered = filter_movements_by_date(movements, start_date, end_date)
+    return ensure_chronological_order(filtered)
 
 
 @router.get("/api/metrics/b2b", response_model=list[FinancialMovement])
@@ -107,7 +112,8 @@ def get_b2b_metrics(
     movements = [
         movement for movement in generate_mock_movements(seed=42) if movement.business_type == "B2B"
     ]
-    return filter_movements_by_date(movements, start_date, end_date)
+    filtered = filter_movements_by_date(movements, start_date, end_date)
+    return ensure_chronological_order(filtered)
 
 
 @router.get("/api/metrics/b2c", response_model=list[FinancialMovement])
@@ -118,4 +124,5 @@ def get_b2c_metrics(
     movements = [
         movement for movement in generate_mock_movements(seed=42) if movement.business_type == "B2C"
     ]
-    return filter_movements_by_date(movements, start_date, end_date)
+    filtered = filter_movements_by_date(movements, start_date, end_date)
+    return ensure_chronological_order(filtered)
