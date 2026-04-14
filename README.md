@@ -15,17 +15,28 @@ _Estas instrucciones están [disponibles en español](./README.es.md)._
 
 ---
 
-_Dashboard de metricas financieras con frontend en React + TypeScript y backend en FastAPI._
+_Financial metrics dashboard with a React + TypeScript frontend and a FastAPI backend._
 
-## Pasos recomendados
+## Recommended steps
 
-1. Haz un fork de este repositorio a tu cuenta.
-2. Clona tu fork y abre el proyecto en tu editor.
-3. Ejecuta tu agente de IA para inspeccionar frontend y backend.
-4. Documenta las reglas propuestas y el banco de memoria en tu fork.
-5. Ajusta y valida las reglas hasta que sean aplicables al flujo real del proyecto.
+1. Fork this repository to your account.
+2. Clone your fork and open the project in your editor.
+3. Run your AI agent to inspect both frontend and backend.
+4. Document the proposed rules and memory bank in your fork.
+5. Refine and validate the rules until they fit the project's real workflow.
 
-## Como ejecutar en local
+## Expected agents directory structure
+
+```text
+./.agents
+└─ /rules
+   └─ <rule-name>.md
+└─ /skills
+   └─ /<skill-name>
+      └─ /README.md
+```
+
+## How to run locally
 
 ```bash
 docker compose up --build
@@ -33,7 +44,7 @@ docker compose up --build
 
 - Frontend: http://localhost:5173
 - Backend: http://localhost:8000
-- Documentacion API: http://localhost:8000/docs
+- API documentation: http://localhost:8000/docs
 
 ---
 

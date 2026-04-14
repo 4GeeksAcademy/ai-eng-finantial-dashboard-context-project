@@ -9,13 +9,13 @@ Por [@marcogonzalo](https://github.com/marcogonzalo) y [otros contribuidores](ht
 
 _These instructions are [available in English](./README.md)._
 
-**Antes de empezar**: 📗 [Lee las instrucciones](https://4geeks.com/lesson/how-to-start-a-project) sobre como comenzar un proyecto de programacion.
+**Antes de empezar**: 📗 [Lee las instrucciones](https://4geeks.com/lesson/how-to-start-a-project) sobre cómo comenzar un proyecto de programación.
 
 <!-- endhide -->
 
 ---
 
-_Dashboard de metricas financieras con frontend en React + TypeScript y backend en FastAPI._
+_Dashboard de métricas financieras con frontend en React + TypeScript y backend en FastAPI._
 
 ## Pasos recomendados
 
@@ -25,7 +25,18 @@ _Dashboard de metricas financieras con frontend en React + TypeScript y backend 
 4. Documenta las reglas propuestas y el banco de memoria en tu fork.
 5. Ajusta y valida las reglas hasta que sean aplicables al flujo real del proyecto.
 
-## Como ejecutar en local
+## Estructura esperada del directorio para agentes
+
+```text
+./.agents
+└─ /rules
+   └─ <nombre-regla>.md
+└─ /skills
+   └─ /<nombre-skill>
+      └─ /README.md
+```
+
+## Cómo ejecutar en local
 
 ```bash
 docker compose up --build
@@ -33,8 +44,8 @@ docker compose up --build
 
 - Frontend: http://localhost:5173
 - Backend: http://localhost:8000
-- Documentacion API: http://localhost:8000/docs
+- Documentación API: http://localhost:8000/docs
 
 ---
 
-Este y muchos otros proyectos son construidos por estudiantes como parte de los [Coding Bootcamps](https://4geeksacademy.com/) de 4Geeks Academy. Encuentra mas acerca de los [cursos](https://4geeksacademy.com/es/comparar-programas) de [Ingenieria de IA](https://4geeksacademy.com/es/coding-bootcamps/ingenieria-ia), [Data Science & Machine Learning](https://4geeksacademy.com/es/coding-bootcamps/curso-datascience-machine-learning), [Ciberseguridad](https://4geeksacademy.com/es/coding-bootcamps/curso-ciberseguridad) y [Full-Stack Software Developer con IA](https://4geeksacademy.com/es/coding-bootcamps/programador-full-stack).
+Este y muchos otros proyectos son construidos por estudiantes como parte de los [Coding Bootcamps](https://4geeksacademy.com/) de 4Geeks Academy. Encuentra más acerca de los [cursos](https://4geeksacademy.com/es/comparar-programas) de [Ingeniería de IA](https://4geeksacademy.com/es/coding-bootcamps/ingenieria-ia), [Data Science & Machine Learning](https://4geeksacademy.com/es/coding-bootcamps/curso-datascience-machine-learning), [Ciberseguridad](https://4geeksacademy.com/es/coding-bootcamps/curso-ciberseguridad) y [Full-Stack Software Developer con IA](https://4geeksacademy.com/es/coding-bootcamps/programador-full-stack).
