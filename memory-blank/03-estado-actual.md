@@ -39,6 +39,10 @@
 5. Aumentar cobertura de pruebas para flujos de error asincrono en frontend.
 6. Definir una estrategia de datos persistentes para salir del modo mock.
 
+## Convenciones operativas
+
+- Los archivos de especificacion funcional del frontend se almacenan en `frontend/specs`.
+
 ## Evidencia principal
 
 - [frontend/src/App.tsx](../frontend/src/App.tsx)
