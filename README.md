@@ -17,6 +17,8 @@ _Estas instrucciones están [disponibles en español](./README.es.md)._
 
 _Financial metrics dashboard with a React + TypeScript frontend and a FastAPI backend._
 
+My short collaboration summary: [myColabs.md](./myColabs.md)
+
 ## Recommended steps
 
 1. Fork this repository to your account.

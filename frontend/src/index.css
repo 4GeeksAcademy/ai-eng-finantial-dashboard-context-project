@@ -75,6 +75,7 @@
   --profit-badge-fg: oklch(0.72 0.16 255);
 }
 
+
 @theme inline {
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
