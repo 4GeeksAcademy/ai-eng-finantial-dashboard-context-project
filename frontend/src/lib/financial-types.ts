@@ -23,6 +23,13 @@ export interface MetricsFacets {
   max_date: string
 }
 
+export interface MetricsAlert {
+  period: string
+  outcome_total: number
+  baseline_average: number
+  increase_ratio: number
+}
+
 export interface KPIMetrics {
   totalIncome: number
   totalOutcome: number

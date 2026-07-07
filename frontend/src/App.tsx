@@ -1,4 +1,5 @@
-import { type FormEvent, useEffect, useState } from "react";
+import { type ChangeEvent, type FormEvent, useEffect, useState } from "react";
+import { AnomalyAlertsTable } from "@/components/dashboard/anomaly-alerts-table";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { KPIRow } from "@/components/dashboard/kpi-row";
 import { IncomeOutcomeChart } from "@/components/dashboard/income-outcome-chart";
@@ -7,14 +8,21 @@ import {
   type DateRangeFilters,
   type FinancialMovement,
   type KPIMetrics,
+  type MetricsAlert,
   type MetricsFacets,
   type MonthlyDataPoint,
 } from "@/lib/financial-types";
 import { computeKPIs, computeMonthlyData } from "@/lib/financial-utils";
 import {
+  buildAlertsQuery,
   buildMetricsQuery,
   buildPeriodLabel,
+  DEFAULT_ALERT_THRESHOLD,
+  MAX_ALERT_THRESHOLD,
+  MIN_ALERT_THRESHOLD,
   normalizeDateInput,
+  normalizeThresholdInput,
+  validateAlertThreshold,
   validateDateRange,
 } from "@/lib/date-range-filters";
 
@@ -40,14 +48,39 @@ async function fetchMetricsFacets(signal: AbortSignal): Promise<MetricsFacets> {
   return response.json();
 }
 
+async function fetchMetricsAlerts(
+  filters: DateRangeFilters,
+  threshold: number,
+  signal: AbortSignal,
+): Promise<MetricsAlert[]> {
+  const query = buildAlertsQuery(filters, threshold);
+  const response = await fetch(`${API_BASE_URL}/api/metrics/alerts${query}`, {
+    signal,
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to fetch metrics alerts: ${response.status}`);
+  }
+  return response.json();
+}
+
 function App() {
   const [metrics, setMetrics] = useState<KPIMetrics | null>(null);
   const [monthlyData, setMonthlyData] = useState<MonthlyDataPoint[]>([]);
+  const [alerts, setAlerts] = useState<MetricsAlert[]>([]);
   const [loading, setLoading] = useState(true);
+  const [alertsLoading, setAlertsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [alertsError, setAlertsError] = useState<string | null>(null);
   const [facets, setFacets] = useState<MetricsFacets | null>(null);
   const [startDateInput, setStartDateInput] = useState("");
   const [endDateInput, setEndDateInput] = useState("");
+  const [thresholdInput, setThresholdInput] = useState(
+    DEFAULT_ALERT_THRESHOLD.toFixed(2),
+  );
+  const [thresholdError, setThresholdError] = useState<string | null>(null);
+  const [appliedThreshold, setAppliedThreshold] = useState(
+    DEFAULT_ALERT_THRESHOLD,
+  );
   const [appliedFilters, setAppliedFilters] = useState<DateRangeFilters>({
     startDate: null,
     endDate: null,
@@ -116,6 +149,49 @@ function App() {
     };
   }, [appliedFilters]);
 
+  useEffect(() => {
+    const validationError = validateDateRange(appliedFilters);
+    if (validationError) {
+      setAlertsError(validationError);
+      setAlertsLoading(false);
+      return;
+    }
+
+    const thresholdValidationError = validateAlertThreshold(appliedThreshold);
+    if (thresholdValidationError) {
+      setThresholdError(thresholdValidationError);
+      setAlertsLoading(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    setAlertsLoading(true);
+    setAlertsError(null);
+
+    fetchMetricsAlerts(appliedFilters, appliedThreshold, controller.signal)
+      .then((payload) => {
+        setAlerts(payload);
+      })
+      .catch((requestError: unknown) => {
+        if (
+          requestError instanceof Error &&
+          requestError.name === "AbortError"
+        ) {
+          return;
+        }
+        setAlertsError(
+          "No se pudieron cargar las alertas de anomalias. Revisa la API de backend.",
+        );
+      })
+      .finally(() => {
+        setAlertsLoading(false);
+      });
+
+    return () => {
+      controller.abort();
+    };
+  }, [appliedFilters, appliedThreshold]);
+
   function handleApplyFilters(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
 
@@ -140,6 +216,34 @@ function App() {
     setError(null);
   }
 
+  function handleStartDateChange(event: ChangeEvent<HTMLInputElement>): void {
+    setStartDateInput(event.target.value);
+  }
+
+  function handleEndDateChange(event: ChangeEvent<HTMLInputElement>): void {
+    setEndDateInput(event.target.value);
+  }
+
+  function handleThresholdChange(event: ChangeEvent<HTMLInputElement>): void {
+    const { value } = event.target;
+    setThresholdInput(value);
+
+    const normalizedThreshold = normalizeThresholdInput(value);
+    if (normalizedThreshold === null) {
+      setThresholdError("El umbral debe ser un numero valido.");
+      return;
+    }
+
+    const validationError = validateAlertThreshold(normalizedThreshold);
+    if (validationError) {
+      setThresholdError(validationError);
+      return;
+    }
+
+    setThresholdError(null);
+    setAppliedThreshold(normalizedThreshold);
+  }
+
   return (
     <main className="dark min-h-screen bg-background text-foreground">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -159,7 +263,7 @@ function App() {
                 <input
                   type="date"
                   value={startDateInput}
-                  onChange={(event) => setStartDateInput(event.target.value)}
+                  onChange={handleStartDateChange}
                   min={facets?.min_date}
                   max={facets?.max_date}
                   className="h-10 rounded-md border border-input bg-background px-3 text-foreground"
@@ -171,7 +275,7 @@ function App() {
                 <input
                   type="date"
                   value={endDateInput}
-                  onChange={(event) => setEndDateInput(event.target.value)}
+                  onChange={handleEndDateChange}
                   min={facets?.min_date}
                   max={facets?.max_date}
                   className="h-10 rounded-md border border-input bg-background px-3 text-foreground"
@@ -215,6 +319,20 @@ function App() {
           >
             <IncomeOutcomeChart data={monthlyData} loading={loading} />
             <ProfitPercentChart data={monthlyData} loading={loading} />
+          </section>
+
+          <section aria-label="Anomaly alerts">
+            <AnomalyAlertsTable
+              alerts={alerts}
+              loading={alertsLoading}
+              error={alertsError}
+              thresholdInput={thresholdInput}
+              thresholdError={thresholdError}
+              onThresholdChange={handleThresholdChange}
+            />
+            <p className="mt-2 text-xs text-muted-foreground">
+              Umbral permitido: {MIN_ALERT_THRESHOLD.toFixed(2)} a {MAX_ALERT_THRESHOLD.toFixed(1)}.
+            </p>
           </section>
         </div>
       </div>

@@ -1,6 +1,9 @@
 import { type DateRangeFilters } from "./financial-types";
 
 const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+export const DEFAULT_ALERT_THRESHOLD = 0.3;
+export const MIN_ALERT_THRESHOLD = 0.01;
+export const MAX_ALERT_THRESHOLD = 1;
 
 function isValidISODate(value: string): boolean {
   if (!ISO_DATE_PATTERN.test(value)) {
@@ -56,6 +59,43 @@ export function buildMetricsQuery(filters: DateRangeFilters): string {
   if (filters.endDate) {
     params.set("end_date", filters.endDate);
   }
+
+  const query = params.toString();
+  return query ? `?${query}` : "";
+}
+
+export function validateAlertThreshold(threshold: number): string | null {
+  if (!Number.isFinite(threshold)) {
+    return "El umbral debe ser un numero valido.";
+  }
+
+  if (threshold < MIN_ALERT_THRESHOLD || threshold > MAX_ALERT_THRESHOLD) {
+    return "El umbral debe estar entre 0.01 y 1.0.";
+  }
+
+  return null;
+}
+
+export function normalizeThresholdInput(value: string): number | null {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  const parsed = Number(trimmed);
+  if (!Number.isFinite(parsed)) {
+    return null;
+  }
+
+  return parsed;
+}
+
+export function buildAlertsQuery(
+  filters: DateRangeFilters,
+  threshold: number,
+): string {
+  const params = new URLSearchParams(buildMetricsQuery(filters).replace(/^\?/, ""));
+  params.set("threshold", threshold.toString());
 
   const query = params.toString();
   return query ? `?${query}` : "";

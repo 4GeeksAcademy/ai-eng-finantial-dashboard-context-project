@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  buildAlertsQuery,
   buildMetricsQuery,
   buildPeriodLabel,
+  normalizeThresholdInput,
+  validateAlertThreshold,
   normalizeDateInput,
   validateDateRange,
 } from "./date-range-filters";
@@ -50,5 +53,45 @@ describe("buildMetricsQuery", () => {
 describe("buildPeriodLabel", () => {
   it("returns Full Year when no filters are set", () => {
     expect(buildPeriodLabel({ startDate: null, endDate: null })).toBe("Full Year");
+  });
+});
+
+describe("normalizeThresholdInput", () => {
+  it("returns null for empty input", () => {
+    expect(normalizeThresholdInput(" ")).toBeNull();
+  });
+
+  it("parses valid numeric input", () => {
+    expect(normalizeThresholdInput("0.35")).toBe(0.35);
+  });
+});
+
+describe("validateAlertThreshold", () => {
+  it("accepts values inside range", () => {
+    expect(validateAlertThreshold(0.01)).toBeNull();
+    expect(validateAlertThreshold(0.3)).toBeNull();
+    expect(validateAlertThreshold(1)).toBeNull();
+  });
+
+  it("rejects values outside allowed range", () => {
+    expect(validateAlertThreshold(0)).toBe("El umbral debe estar entre 0.01 y 1.0.");
+    expect(validateAlertThreshold(1.01)).toBe("El umbral debe estar entre 0.01 y 1.0.");
+  });
+});
+
+describe("buildAlertsQuery", () => {
+  it("includes threshold without dates", () => {
+    expect(buildAlertsQuery({ startDate: null, endDate: null }, 0.3)).toBe(
+      "?threshold=0.3",
+    );
+  });
+
+  it("includes threshold and date range", () => {
+    expect(
+      buildAlertsQuery(
+        { startDate: "2026-01-01", endDate: "2026-01-31" },
+        0.45,
+      ),
+    ).toBe("?start_date=2026-01-01&end_date=2026-01-31&threshold=0.45");
   });
 });
