@@ -1,22 +1,35 @@
 import { type ChangeEvent, type FormEvent, useEffect, useState } from "react";
 import { AnomalyAlertsTable } from "@/components/dashboard/anomaly-alerts-table";
+import { BusinessIncomeComparisonChart } from "@/components/dashboard/business-income-comparison-chart";
+import { BusinessIncomeTable } from "@/components/dashboard/business-income-table";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { KPIRow } from "@/components/dashboard/kpi-row";
 import { IncomeOutcomeChart } from "@/components/dashboard/income-outcome-chart";
 import { ProfitPercentChart } from "@/components/dashboard/profit-percent-chart";
 import {
+  type BusinessCategoryShare,
+  type BusinessType,
   type DateRangeFilters,
+  type DashboardView,
   type FinancialMovement,
   type KPIMetrics,
   type MetricsAlert,
   type MetricsFacets,
   type MonthlyDataPoint,
+  type TopCategoryItem,
 } from "@/lib/financial-types";
-import { computeKPIs, computeMonthlyData } from "@/lib/financial-utils";
+import {
+  computeCategoryShareRows,
+  computeIncomeTotal,
+  computeKPIs,
+  computeMonthlyData,
+} from "@/lib/financial-utils";
 import {
   buildAlertsQuery,
+  buildBusinessMetricsQuery,
   buildMetricsQuery,
   buildPeriodLabel,
+  buildTopCategoriesQuery,
   DEFAULT_ALERT_THRESHOLD,
   MAX_ALERT_THRESHOLD,
   MIN_ALERT_THRESHOLD,
@@ -27,6 +40,7 @@ import {
 } from "@/lib/date-range-filters";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
+const TOP_CATEGORIES_LIMIT = 5;
 
 async function fetchFinancialData(
   filters: DateRangeFilters,
@@ -63,14 +77,51 @@ async function fetchMetricsAlerts(
   return response.json();
 }
 
+async function fetchTopCategories(
+  filters: DateRangeFilters,
+  businessType: BusinessType,
+  limit: number,
+  signal: AbortSignal,
+): Promise<TopCategoryItem[]> {
+  const query = buildTopCategoriesQuery(filters, businessType, limit);
+  const response = await fetch(`${API_BASE_URL}/api/metrics/categories/top${query}`, {
+    signal,
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to fetch top categories: ${response.status}`);
+  }
+  return response.json();
+}
+
+async function fetchBusinessIncomeMovements(
+  filters: DateRangeFilters,
+  businessType: BusinessType,
+  signal: AbortSignal,
+): Promise<FinancialMovement[]> {
+  const endpoint = businessType === "B2B" ? "/api/metrics/b2b" : "/api/metrics/b2c";
+  const query = buildBusinessMetricsQuery(filters, "income");
+  const response = await fetch(`${API_BASE_URL}${endpoint}${query}`, { signal });
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ${businessType} income movements: ${response.status}`);
+  }
+  return response.json();
+}
+
 function App() {
+  const [activeView, setActiveView] = useState<DashboardView>("overview");
   const [metrics, setMetrics] = useState<KPIMetrics | null>(null);
   const [monthlyData, setMonthlyData] = useState<MonthlyDataPoint[]>([]);
   const [alerts, setAlerts] = useState<MetricsAlert[]>([]);
+  const [b2bRows, setB2bRows] = useState<BusinessCategoryShare[]>([]);
+  const [b2cRows, setB2cRows] = useState<BusinessCategoryShare[]>([]);
+  const [b2bTotalIncome, setB2bTotalIncome] = useState(0);
+  const [b2cTotalIncome, setB2cTotalIncome] = useState(0);
   const [loading, setLoading] = useState(true);
   const [alertsLoading, setAlertsLoading] = useState(true);
+  const [comparisonLoading, setComparisonLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [alertsError, setAlertsError] = useState<string | null>(null);
+  const [comparisonError, setComparisonError] = useState<string | null>(null);
   const [facets, setFacets] = useState<MetricsFacets | null>(null);
   const [startDateInput, setStartDateInput] = useState("");
   const [endDateInput, setEndDateInput] = useState("");
@@ -113,6 +164,10 @@ function App() {
   }, []);
 
   useEffect(() => {
+    if (activeView !== "overview") {
+      return;
+    }
+
     const validationError = validateDateRange(appliedFilters);
     if (validationError) {
       setError(validationError);
@@ -147,9 +202,13 @@ function App() {
     return () => {
       controller.abort();
     };
-  }, [appliedFilters]);
+  }, [activeView, appliedFilters]);
 
   useEffect(() => {
+    if (activeView !== "overview") {
+      return;
+    }
+
     const validationError = validateDateRange(appliedFilters);
     if (validationError) {
       setAlertsError(validationError);
@@ -190,7 +249,68 @@ function App() {
     return () => {
       controller.abort();
     };
-  }, [appliedFilters, appliedThreshold]);
+  }, [activeView, appliedFilters, appliedThreshold]);
+
+  useEffect(() => {
+    if (activeView !== "comparison") {
+      return;
+    }
+
+    const validationError = validateDateRange(appliedFilters);
+    if (validationError) {
+      setB2bRows([]);
+      setB2cRows([]);
+      setB2bTotalIncome(0);
+      setB2cTotalIncome(0);
+      setComparisonError(validationError);
+      setComparisonLoading(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    const limit = Math.min(TOP_CATEGORIES_LIMIT, facets?.categories.length ?? TOP_CATEGORIES_LIMIT);
+
+    setComparisonLoading(true);
+    setComparisonError(null);
+
+    Promise.all([
+      fetchTopCategories(appliedFilters, "B2B", limit, controller.signal),
+      fetchTopCategories(appliedFilters, "B2C", limit, controller.signal),
+      fetchBusinessIncomeMovements(appliedFilters, "B2B", controller.signal),
+      fetchBusinessIncomeMovements(appliedFilters, "B2C", controller.signal),
+    ])
+      .then(([b2bTopCategories, b2cTopCategories, b2bMovements, b2cMovements]) => {
+        const nextB2bTotal = computeIncomeTotal(b2bMovements);
+        const nextB2cTotal = computeIncomeTotal(b2cMovements);
+
+        setB2bTotalIncome(nextB2bTotal);
+        setB2cTotalIncome(nextB2cTotal);
+        setB2bRows(computeCategoryShareRows(b2bTopCategories, nextB2bTotal));
+        setB2cRows(computeCategoryShareRows(b2cTopCategories, nextB2cTotal));
+      })
+      .catch((requestError: unknown) => {
+        if (
+          requestError instanceof Error &&
+          requestError.name === "AbortError"
+        ) {
+          return;
+        }
+        setB2bRows([]);
+        setB2cRows([]);
+        setB2bTotalIncome(0);
+        setB2cTotalIncome(0);
+        setComparisonError(
+          "No se pudo cargar la comparativa B2B vs B2C. Revisa la API de backend.",
+        );
+      })
+      .finally(() => {
+        setComparisonLoading(false);
+      });
+
+    return () => {
+      controller.abort();
+    };
+  }, [activeView, appliedFilters, facets?.categories.length]);
 
   function handleApplyFilters(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
@@ -244,11 +364,48 @@ function App() {
     setAppliedThreshold(normalizedThreshold);
   }
 
+  const headerTitle =
+    activeView === "overview" ? "Financial Overview" : "B2B vs B2C Comparison";
+  const headerSubtitle =
+    activeView === "overview"
+      ? "Executive metrics dashboard"
+      : "Income performance comparison by business line";
+  const availableComparisonCategories = facets?.categories ?? [];
+
   return (
     <main className="dark min-h-screen bg-background text-foreground">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-8">
-          <DashboardHeader period={periodLabel} />
+          <DashboardHeader
+            title={headerTitle}
+            subtitle={headerSubtitle}
+            period={periodLabel}
+          />
+
+          <section aria-label="Dashboard views" className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setActiveView("overview")}
+              className={
+                activeView === "overview"
+                  ? "rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+                  : "rounded-md border border-border bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground"
+              }
+            >
+              Overview
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveView("comparison")}
+              className={
+                activeView === "comparison"
+                  ? "rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+                  : "rounded-md border border-border bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground"
+              }
+            >
+              B2B vs B2C
+            </button>
+          </section>
 
           <section
             aria-label="Date range filters"
@@ -303,37 +460,79 @@ function App() {
             </p>
           </section>
 
-          {error ? (
+          {activeView === "overview" && error ? (
             <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive-foreground">
               {error}
             </div>
           ) : null}
 
-          <section aria-label="Key performance indicators">
-            <KPIRow metrics={metrics} loading={loading} />
-          </section>
+          {activeView === "overview" ? (
+            <>
+              <section aria-label="Key performance indicators">
+                <KPIRow metrics={metrics} loading={loading} />
+              </section>
 
-          <section
-            aria-label="Financial charts"
-            className="grid grid-cols-1 gap-4 xl:grid-cols-2"
-          >
-            <IncomeOutcomeChart data={monthlyData} loading={loading} />
-            <ProfitPercentChart data={monthlyData} loading={loading} />
-          </section>
+              <section
+                aria-label="Financial charts"
+                className="grid grid-cols-1 gap-4 xl:grid-cols-2"
+              >
+                <IncomeOutcomeChart data={monthlyData} loading={loading} />
+                <ProfitPercentChart data={monthlyData} loading={loading} />
+              </section>
 
-          <section aria-label="Anomaly alerts">
-            <AnomalyAlertsTable
-              alerts={alerts}
-              loading={alertsLoading}
-              error={alertsError}
-              thresholdInput={thresholdInput}
-              thresholdError={thresholdError}
-              onThresholdChange={handleThresholdChange}
-            />
-            <p className="mt-2 text-xs text-muted-foreground">
-              Umbral permitido: {MIN_ALERT_THRESHOLD.toFixed(2)} a {MAX_ALERT_THRESHOLD.toFixed(1)}.
-            </p>
-          </section>
+              <section aria-label="Anomaly alerts">
+                <AnomalyAlertsTable
+                  alerts={alerts}
+                  loading={alertsLoading}
+                  error={alertsError}
+                  thresholdInput={thresholdInput}
+                  thresholdError={thresholdError}
+                  onThresholdChange={handleThresholdChange}
+                />
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Umbral permitido: {MIN_ALERT_THRESHOLD.toFixed(2)} a {MAX_ALERT_THRESHOLD.toFixed(1)}.
+                </p>
+              </section>
+            </>
+          ) : (
+            <>
+              {comparisonError ? (
+                <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive-foreground">
+                  {comparisonError}
+                </div>
+              ) : null}
+
+              <section
+                aria-label="Business income category comparison"
+                className="grid grid-cols-1 gap-4 xl:grid-cols-2"
+              >
+                <BusinessIncomeTable
+                  businessType="B2B"
+                  rows={b2bRows}
+                  totalIncome={b2bTotalIncome}
+                  availableCategories={availableComparisonCategories}
+                  loading={comparisonLoading}
+                  error={null}
+                />
+                <BusinessIncomeTable
+                  businessType="B2C"
+                  rows={b2cRows}
+                  totalIncome={b2cTotalIncome}
+                  availableCategories={availableComparisonCategories}
+                  loading={comparisonLoading}
+                  error={null}
+                />
+              </section>
+
+              <section aria-label="B2B and B2C income comparison chart">
+                <BusinessIncomeComparisonChart
+                  b2bTotal={b2bTotalIncome}
+                  b2cTotal={b2cTotalIncome}
+                  loading={comparisonLoading}
+                />
+              </section>
+            </>
+          )}
         </div>
       </div>
     </main>

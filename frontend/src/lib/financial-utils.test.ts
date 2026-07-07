@@ -1,12 +1,14 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  computeCategoryShareRows,
+  computeIncomeTotal,
   computeKPIs,
   computeMonthlyData,
   formatCurrency,
   formatPercent,
 } from "./financial-utils";
-import type { FinancialMovement } from "./financial-types";
+import type { FinancialMovement, TopCategoryItem } from "./financial-types";
 
 const sampleMovements: FinancialMovement[] = [
   {
@@ -110,5 +112,23 @@ describe("formatters", () => {
 
   it("formats percent with one decimal", () => {
     expect(formatPercent(15.555)).toBe("15.6%");
+  });
+});
+
+describe("comparison utilities", () => {
+  it("computes income total using only income movements", () => {
+    expect(computeIncomeTotal(sampleMovements)).toBe(1500);
+  });
+
+  it("computes category share rows over total income", () => {
+    const topCategories: TopCategoryItem[] = [
+      { category: "sales", operation_type: "income", total_amount: 900 },
+      { category: "others", operation_type: "income", total_amount: 300 },
+    ];
+
+    expect(computeCategoryShareRows(topCategories, 1500)).toEqual([
+      { category: "sales", totalAmount: 900, sharePercent: 60 },
+      { category: "others", totalAmount: 300, sharePercent: 20 },
+    ]);
   });
 });

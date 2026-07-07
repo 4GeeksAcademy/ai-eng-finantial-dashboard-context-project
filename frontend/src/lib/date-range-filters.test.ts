@@ -2,8 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import {
   buildAlertsQuery,
+  buildBusinessMetricsQuery,
   buildMetricsQuery,
   buildPeriodLabel,
+  buildTopCategoriesQuery,
   normalizeThresholdInput,
   validateAlertThreshold,
   normalizeDateInput,
@@ -93,5 +95,28 @@ describe("buildAlertsQuery", () => {
         0.45,
       ),
     ).toBe("?start_date=2026-01-01&end_date=2026-01-31&threshold=0.45");
+  });
+});
+
+describe("comparison queries", () => {
+  it("builds top categories query for a business type", () => {
+    expect(
+      buildTopCategoriesQuery(
+        { startDate: "2026-01-01", endDate: "2026-01-31" },
+        "B2B",
+        5,
+      ),
+    ).toBe(
+      "?start_date=2026-01-01&end_date=2026-01-31&operation_type=income&business_type=B2B&limit=5",
+    );
+  });
+
+  it("builds business metrics query with date range and operation type", () => {
+    expect(
+      buildBusinessMetricsQuery(
+        { startDate: "2026-01-01", endDate: null },
+        "income",
+      ),
+    ).toBe("?start_date=2026-01-01&operation_type=income");
   });
 });

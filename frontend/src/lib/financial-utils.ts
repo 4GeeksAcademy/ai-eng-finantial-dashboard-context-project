@@ -1,7 +1,9 @@
 import {
+  type BusinessCategoryShare,
   type FinancialMovement,
   type KPIMetrics,
   type MonthlyDataPoint,
+  type TopCategoryItem,
 } from "./financial-types";
 
 function toYearMonthKey(value: Date): string {
@@ -77,4 +79,21 @@ export function formatCurrency(value: number): string {
 
 export function formatPercent(value: number): string {
   return `${value.toFixed(1)}%`;
+}
+
+export function computeIncomeTotal(movements: FinancialMovement[]): number {
+  return movements
+    .filter((movement) => movement.operation_type === "income")
+    .reduce((sum, movement) => sum + movement.amount, 0);
+}
+
+export function computeCategoryShareRows(
+  categories: TopCategoryItem[],
+  totalIncome: number,
+): BusinessCategoryShare[] {
+  return categories.map((item) => ({
+    category: item.category,
+    totalAmount: item.total_amount,
+    sharePercent: totalIncome > 0 ? (item.total_amount / totalIncome) * 100 : 0,
+  }));
 }

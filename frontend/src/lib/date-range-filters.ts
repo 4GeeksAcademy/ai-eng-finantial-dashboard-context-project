@@ -1,4 +1,4 @@
-import { type DateRangeFilters } from "./financial-types";
+import { type BusinessType, type DateRangeFilters } from "./financial-types";
 
 const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 export const DEFAULT_ALERT_THRESHOLD = 0.3;
@@ -96,6 +96,31 @@ export function buildAlertsQuery(
 ): string {
   const params = new URLSearchParams(buildMetricsQuery(filters).replace(/^\?/, ""));
   params.set("threshold", threshold.toString());
+
+  const query = params.toString();
+  return query ? `?${query}` : "";
+}
+
+export function buildTopCategoriesQuery(
+  filters: DateRangeFilters,
+  businessType: BusinessType,
+  limit: number,
+): string {
+  const params = new URLSearchParams(buildMetricsQuery(filters).replace(/^\?/, ""));
+  params.set("operation_type", "income");
+  params.set("business_type", businessType);
+  params.set("limit", limit.toString());
+
+  const query = params.toString();
+  return query ? `?${query}` : "";
+}
+
+export function buildBusinessMetricsQuery(
+  filters: DateRangeFilters,
+  operationType: "income" | "outcome",
+): string {
+  const params = new URLSearchParams(buildMetricsQuery(filters).replace(/^\?/, ""));
+  params.set("operation_type", operationType);
 
   const query = params.toString();
   return query ? `?${query}` : "";

@@ -30,6 +30,20 @@ export interface MetricsAlert {
   increase_ratio: number
 }
 
+export interface TopCategoryItem {
+  category: Category
+  operation_type: OperationType
+  total_amount: number
+}
+
+export interface BusinessCategoryShare {
+  category: Category
+  totalAmount: number
+  sharePercent: number
+}
+
+export type DashboardView = 'overview' | 'comparison'
+
 export interface KPIMetrics {
   totalIncome: number
   totalOutcome: number
