@@ -374,8 +374,15 @@ function App() {
 
   return (
     <main className="dark min-h-screen bg-background text-foreground">
+      <a
+        href="#dashboard-content"
+        className="sr-only rounded-md bg-card px-3 py-2 text-sm text-foreground focus:not-sr-only focus:absolute focus:left-4 focus:top-4"
+      >
+        Saltar al contenido principal
+      </a>
+
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-8">
+        <div id="dashboard-content" className="flex flex-col gap-8">
           <DashboardHeader
             title={headerTitle}
             subtitle={headerSubtitle}
@@ -386,10 +393,11 @@ function App() {
             <button
               type="button"
               onClick={() => setActiveView("overview")}
+              aria-pressed={activeView === "overview"}
               className={
                 activeView === "overview"
-                  ? "rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
-                  : "rounded-md border border-border bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground"
+                  ? "rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+                  : "rounded-md border border-border bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/80"
               }
             >
               Overview
@@ -397,10 +405,11 @@ function App() {
             <button
               type="button"
               onClick={() => setActiveView("comparison")}
+              aria-pressed={activeView === "comparison"}
               className={
                 activeView === "comparison"
-                  ? "rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
-                  : "rounded-md border border-border bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground"
+                  ? "rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+                  : "rounded-md border border-border bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/80"
               }
             >
               B2B vs B2C
@@ -412,7 +421,7 @@ function App() {
             className="rounded-lg border border-border bg-card p-4"
           >
             <form
-              className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_1fr_auto_auto]"
+              className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_1fr_auto]"
               onSubmit={handleApplyFilters}
             >
               <label className="flex flex-col gap-1 text-sm text-muted-foreground">
@@ -439,20 +448,22 @@ function App() {
                 />
               </label>
 
-              <button
-                type="submit"
-                className="h-10 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90"
-              >
-                Aplicar
-              </button>
+              <div className="flex items-end gap-2 md:self-end">
+                <button
+                  type="submit"
+                  className="h-10 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+                >
+                  Aplicar
+                </button>
 
-              <button
-                type="button"
-                onClick={handleClearFilters}
-                className="h-10 rounded-md border border-border bg-secondary px-4 text-sm font-medium text-secondary-foreground hover:opacity-90"
-              >
-                Limpiar
-              </button>
+                <button
+                  type="button"
+                  onClick={handleClearFilters}
+                  className="h-10 rounded-md border border-border bg-secondary px-4 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/80"
+                >
+                  Limpiar
+                </button>
+              </div>
             </form>
 
             <p className="mt-2 text-xs text-muted-foreground">
@@ -461,7 +472,10 @@ function App() {
           </section>
 
           {activeView === "overview" && error ? (
-            <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive-foreground">
+            <div
+              role="alert"
+              className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive-foreground"
+            >
               {error}
             </div>
           ) : null}
@@ -497,7 +511,10 @@ function App() {
           ) : (
             <>
               {comparisonError ? (
-                <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive-foreground">
+                <div
+                  role="alert"
+                  className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive-foreground"
+                >
                   {comparisonError}
                 </div>
               ) : null}
