@@ -27,6 +27,9 @@ export function AnomalyAlertsTable({
   thresholdError,
   onThresholdChange,
 }: AnomalyAlertsTableProps) {
+  const thresholdHelpId = "threshold-help";
+  const thresholdErrorId = "threshold-error";
+
   return (
     <Card className="border-border/60">
       <CardHeader className="gap-3 pb-4 md:flex-row md:items-end md:justify-between">
@@ -40,6 +43,7 @@ export function AnomalyAlertsTable({
         <label className="flex flex-col gap-1 text-sm text-muted-foreground md:w-44">
           Umbral de deteccion
           <input
+            id="threshold-input"
             type="number"
             min="0.01"
             max="1"
@@ -48,19 +52,31 @@ export function AnomalyAlertsTable({
             onChange={onThresholdChange}
             className="h-10 rounded-md border border-input bg-background px-3 text-foreground"
             aria-invalid={thresholdError ? true : undefined}
+            aria-describedby={thresholdError ? thresholdErrorId : thresholdHelpId}
           />
         </label>
       </CardHeader>
 
       <CardContent className="space-y-3">
+        <p id={thresholdHelpId} className="text-xs text-muted-foreground">
+          Ingresa un valor decimal entre 0.01 y 1.00.
+        </p>
+
         {thresholdError ? (
-          <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive-foreground">
+          <div
+            id={thresholdErrorId}
+            role="alert"
+            className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive-foreground"
+          >
             {thresholdError}
           </div>
         ) : null}
 
         {error ? (
-          <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive-foreground">
+          <div
+            role="alert"
+            className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive-foreground"
+          >
             {error}
           </div>
         ) : null}

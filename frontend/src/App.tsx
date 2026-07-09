@@ -140,6 +140,26 @@ function App() {
   const periodLabel = buildPeriodLabel(appliedFilters);
 
   useEffect(() => {
+    const pageTitle =
+      activeView === "overview"
+        ? "Financial Overview | AI Financial Dashboard"
+        : "B2B vs B2C Comparison | AI Financial Dashboard";
+    const pageDescription =
+      activeView === "overview"
+        ? "Executive financial KPIs, income/outcome trends, and anomaly alerts for your business."
+        : "Compare B2B and B2C income performance by category and total contribution.";
+
+    document.title = pageTitle;
+
+    const descriptionMeta = document.querySelector<HTMLMetaElement>(
+      'meta[name="description"]',
+    );
+    if (descriptionMeta) {
+      descriptionMeta.setAttribute("content", pageDescription);
+    }
+  }, [activeView]);
+
+  useEffect(() => {
     const controller = new AbortController();
 
     fetchMetricsFacets(controller.signal)
@@ -168,16 +188,7 @@ function App() {
       return;
     }
 
-    const validationError = validateDateRange(appliedFilters);
-    if (validationError) {
-      setError(validationError);
-      setLoading(false);
-      return;
-    }
-
     const controller = new AbortController();
-    setLoading(true);
-    setError(null);
 
     fetchFinancialData(appliedFilters, controller.signal)
       .then((movements) => {
@@ -209,23 +220,7 @@ function App() {
       return;
     }
 
-    const validationError = validateDateRange(appliedFilters);
-    if (validationError) {
-      setAlertsError(validationError);
-      setAlertsLoading(false);
-      return;
-    }
-
-    const thresholdValidationError = validateAlertThreshold(appliedThreshold);
-    if (thresholdValidationError) {
-      setThresholdError(thresholdValidationError);
-      setAlertsLoading(false);
-      return;
-    }
-
     const controller = new AbortController();
-    setAlertsLoading(true);
-    setAlertsError(null);
 
     fetchMetricsAlerts(appliedFilters, appliedThreshold, controller.signal)
       .then((payload) => {
@@ -256,22 +251,8 @@ function App() {
       return;
     }
 
-    const validationError = validateDateRange(appliedFilters);
-    if (validationError) {
-      setB2bRows([]);
-      setB2cRows([]);
-      setB2bTotalIncome(0);
-      setB2cTotalIncome(0);
-      setComparisonError(validationError);
-      setComparisonLoading(false);
-      return;
-    }
-
     const controller = new AbortController();
     const limit = Math.min(TOP_CATEGORIES_LIMIT, facets?.categories.length ?? TOP_CATEGORIES_LIMIT);
-
-    setComparisonLoading(true);
-    setComparisonError(null);
 
     Promise.all([
       fetchTopCategories(appliedFilters, "B2B", limit, controller.signal),
@@ -326,14 +307,43 @@ function App() {
       return;
     }
 
+    setError(null);
+    setAlertsError(null);
+    setComparisonError(null);
+    setLoading(true);
+    setAlertsLoading(true);
+    setComparisonLoading(true);
     setAppliedFilters(nextFilters);
   }
 
   function handleClearFilters(): void {
     setStartDateInput("");
     setEndDateInput("");
+    setLoading(true);
+    setAlertsLoading(true);
+    setComparisonLoading(true);
+    setAlertsError(null);
+    setComparisonError(null);
     setAppliedFilters({ startDate: null, endDate: null });
     setError(null);
+  }
+
+  function handleChangeView(view: DashboardView): void {
+    if (view === activeView) {
+      return;
+    }
+
+    if (view === "overview") {
+      setLoading(true);
+      setAlertsLoading(true);
+      setError(null);
+      setAlertsError(null);
+    } else {
+      setComparisonLoading(true);
+      setComparisonError(null);
+    }
+
+    setActiveView(view);
   }
 
   function handleStartDateChange(event: ChangeEvent<HTMLInputElement>): void {
@@ -374,8 +384,15 @@ function App() {
 
   return (
     <main className="dark min-h-screen bg-background text-foreground">
+      <a
+        href="#dashboard-content"
+        className="sr-only rounded-md bg-card px-3 py-2 text-sm text-foreground focus:not-sr-only focus:absolute focus:left-4 focus:top-4"
+      >
+        Saltar al contenido principal
+      </a>
+
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-8">
+        <div id="dashboard-content" className="flex flex-col gap-8">
           <DashboardHeader
             title={headerTitle}
             subtitle={headerSubtitle}
@@ -385,22 +402,24 @@ function App() {
           <section aria-label="Dashboard views" className="flex flex-wrap gap-2">
             <button
               type="button"
-              onClick={() => setActiveView("overview")}
+              onClick={() => handleChangeView("overview")}
+              aria-pressed={activeView === "overview"}
               className={
                 activeView === "overview"
-                  ? "rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
-                  : "rounded-md border border-border bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground"
+                  ? "rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+                  : "rounded-md border border-border bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/80"
               }
             >
               Overview
             </button>
             <button
               type="button"
-              onClick={() => setActiveView("comparison")}
+              onClick={() => handleChangeView("comparison")}
+              aria-pressed={activeView === "comparison"}
               className={
                 activeView === "comparison"
-                  ? "rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
-                  : "rounded-md border border-border bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground"
+                  ? "rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+                  : "rounded-md border border-border bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/80"
               }
             >
               B2B vs B2C
@@ -412,7 +431,7 @@ function App() {
             className="rounded-lg border border-border bg-card p-4"
           >
             <form
-              className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_1fr_auto_auto]"
+              className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_1fr_auto]"
               onSubmit={handleApplyFilters}
             >
               <label className="flex flex-col gap-1 text-sm text-muted-foreground">
@@ -439,20 +458,22 @@ function App() {
                 />
               </label>
 
-              <button
-                type="submit"
-                className="h-10 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90"
-              >
-                Aplicar
-              </button>
+              <div className="flex items-end gap-2 md:self-end">
+                <button
+                  type="submit"
+                  className="h-10 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+                >
+                  Aplicar
+                </button>
 
-              <button
-                type="button"
-                onClick={handleClearFilters}
-                className="h-10 rounded-md border border-border bg-secondary px-4 text-sm font-medium text-secondary-foreground hover:opacity-90"
-              >
-                Limpiar
-              </button>
+                <button
+                  type="button"
+                  onClick={handleClearFilters}
+                  className="h-10 rounded-md border border-border bg-secondary px-4 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/80"
+                >
+                  Limpiar
+                </button>
+              </div>
             </form>
 
             <p className="mt-2 text-xs text-muted-foreground">
@@ -461,7 +482,10 @@ function App() {
           </section>
 
           {activeView === "overview" && error ? (
-            <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive-foreground">
+            <div
+              role="alert"
+              className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive-foreground"
+            >
               {error}
             </div>
           ) : null}
@@ -497,7 +521,10 @@ function App() {
           ) : (
             <>
               {comparisonError ? (
-                <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive-foreground">
+                <div
+                  role="alert"
+                  className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive-foreground"
+                >
                   {comparisonError}
                 </div>
               ) : null}

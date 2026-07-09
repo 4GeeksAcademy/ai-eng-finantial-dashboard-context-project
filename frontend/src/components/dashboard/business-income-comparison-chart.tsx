@@ -79,6 +79,14 @@ export function BusinessIncomeComparisonChart({
                   borderRadius: 12,
                   border: "1px solid var(--color-border)",
                   backgroundColor: "var(--color-card)",
+                  color: "var(--color-foreground)",
+                }}
+                labelStyle={{
+                  color: "var(--color-foreground)",
+                  fontWeight: 600,
+                }}
+                itemStyle={{
+                  color: "var(--color-foreground)",
                 }}
               />
               <Bar dataKey="total" fill="var(--chart-income)" radius={[8, 8, 0, 0]} />
