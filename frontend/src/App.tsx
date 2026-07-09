@@ -140,6 +140,26 @@ function App() {
   const periodLabel = buildPeriodLabel(appliedFilters);
 
   useEffect(() => {
+    const pageTitle =
+      activeView === "overview"
+        ? "Financial Overview | AI Financial Dashboard"
+        : "B2B vs B2C Comparison | AI Financial Dashboard";
+    const pageDescription =
+      activeView === "overview"
+        ? "Executive financial KPIs, income/outcome trends, and anomaly alerts for your business."
+        : "Compare B2B and B2C income performance by category and total contribution.";
+
+    document.title = pageTitle;
+
+    const descriptionMeta = document.querySelector<HTMLMetaElement>(
+      'meta[name="description"]',
+    );
+    if (descriptionMeta) {
+      descriptionMeta.setAttribute("content", pageDescription);
+    }
+  }, [activeView]);
+
+  useEffect(() => {
     const controller = new AbortController();
 
     fetchMetricsFacets(controller.signal)
@@ -168,16 +188,7 @@ function App() {
       return;
     }
 
-    const validationError = validateDateRange(appliedFilters);
-    if (validationError) {
-      setError(validationError);
-      setLoading(false);
-      return;
-    }
-
     const controller = new AbortController();
-    setLoading(true);
-    setError(null);
 
     fetchFinancialData(appliedFilters, controller.signal)
       .then((movements) => {
@@ -209,23 +220,7 @@ function App() {
       return;
     }
 
-    const validationError = validateDateRange(appliedFilters);
-    if (validationError) {
-      setAlertsError(validationError);
-      setAlertsLoading(false);
-      return;
-    }
-
-    const thresholdValidationError = validateAlertThreshold(appliedThreshold);
-    if (thresholdValidationError) {
-      setThresholdError(thresholdValidationError);
-      setAlertsLoading(false);
-      return;
-    }
-
     const controller = new AbortController();
-    setAlertsLoading(true);
-    setAlertsError(null);
 
     fetchMetricsAlerts(appliedFilters, appliedThreshold, controller.signal)
       .then((payload) => {
@@ -256,22 +251,8 @@ function App() {
       return;
     }
 
-    const validationError = validateDateRange(appliedFilters);
-    if (validationError) {
-      setB2bRows([]);
-      setB2cRows([]);
-      setB2bTotalIncome(0);
-      setB2cTotalIncome(0);
-      setComparisonError(validationError);
-      setComparisonLoading(false);
-      return;
-    }
-
     const controller = new AbortController();
     const limit = Math.min(TOP_CATEGORIES_LIMIT, facets?.categories.length ?? TOP_CATEGORIES_LIMIT);
-
-    setComparisonLoading(true);
-    setComparisonError(null);
 
     Promise.all([
       fetchTopCategories(appliedFilters, "B2B", limit, controller.signal),
@@ -326,14 +307,43 @@ function App() {
       return;
     }
 
+    setError(null);
+    setAlertsError(null);
+    setComparisonError(null);
+    setLoading(true);
+    setAlertsLoading(true);
+    setComparisonLoading(true);
     setAppliedFilters(nextFilters);
   }
 
   function handleClearFilters(): void {
     setStartDateInput("");
     setEndDateInput("");
+    setLoading(true);
+    setAlertsLoading(true);
+    setComparisonLoading(true);
+    setAlertsError(null);
+    setComparisonError(null);
     setAppliedFilters({ startDate: null, endDate: null });
     setError(null);
+  }
+
+  function handleChangeView(view: DashboardView): void {
+    if (view === activeView) {
+      return;
+    }
+
+    if (view === "overview") {
+      setLoading(true);
+      setAlertsLoading(true);
+      setError(null);
+      setAlertsError(null);
+    } else {
+      setComparisonLoading(true);
+      setComparisonError(null);
+    }
+
+    setActiveView(view);
   }
 
   function handleStartDateChange(event: ChangeEvent<HTMLInputElement>): void {
@@ -392,7 +402,7 @@ function App() {
           <section aria-label="Dashboard views" className="flex flex-wrap gap-2">
             <button
               type="button"
-              onClick={() => setActiveView("overview")}
+              onClick={() => handleChangeView("overview")}
               aria-pressed={activeView === "overview"}
               className={
                 activeView === "overview"
@@ -404,7 +414,7 @@ function App() {
             </button>
             <button
               type="button"
-              onClick={() => setActiveView("comparison")}
+              onClick={() => handleChangeView("comparison")}
               aria-pressed={activeView === "comparison"}
               className={
                 activeView === "comparison"
