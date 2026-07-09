@@ -13,3 +13,4 @@
 - Agregue la tabla de alertas de anomalias con validacion de umbral y estados de vacio/error/carga (`/api/metrics/alerts`).
 - Agregue la vista comparativa B2B vs B2C con top de categorias de ingreso y grafico comparativo (`/api/metrics/categories/top`, `/api/metrics/facets`).
 - Cree especificaciones tecnicas frontend para tipos API, tipos de parametros, componentes y contratos funcionales.
+-  Agrege 4 skills para agente para mantener las buenas practicas (`/.agents/skills`).
