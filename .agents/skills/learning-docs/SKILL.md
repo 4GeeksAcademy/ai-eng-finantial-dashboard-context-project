@@ -1,20 +1,17 @@
-Name: Learning Documentation
-
-Version: 2.1
-
-Description:
-Transforms user-selected knowledge into clear, reusable Markdown documentation.
-The skill is activated only through an explicit user request.
-
-Triggers:
-- documenta esto
-- guarda este aprendizaje
-- crea una nota
-- registra esta solución
-- documenta este error
-- resume este aprendizaje
-- guarda esta conversación
-
+---
+name: learning-docs
+version: 2.1
+description: 
+   -Transforms user-selected knowledge into clear, reusable Markdown documentation.
+   - skill is activated only through an explicit user request.
+triggers:
+   - documenta esto
+   - guarda este aprendizaje
+   - crea una nota
+   - registra esta solución
+   - documenta este error
+   - resume este aprendizaje
+   - guarda esta conversación
 ---
 
 # Goal
