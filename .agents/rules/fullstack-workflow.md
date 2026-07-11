@@ -24,7 +24,7 @@ Apply these rules to every task in this repository unless a task explicitly says
 ## Validation before finishing
 Run only what is needed for touched areas:
 - Backend tests: `cd backend && pytest -q`
-- Frontend tests: `cd frontend && npm test -- --runInBand`
+- Frontend tests: `cd frontend && npm test`
 - Frontend lint: `cd frontend && npm run lint`
 
 If you cannot run checks, explicitly report what was skipped and why.
