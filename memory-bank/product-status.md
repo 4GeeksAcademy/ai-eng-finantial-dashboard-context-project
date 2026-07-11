@@ -13,4 +13,4 @@ The frontend displays KPIs and charts for income, outcome, and profit trends. Th
 - Testing and quality checks:
   - Frontend unit tests: passing.
   - Frontend lint: passing.
-  - Backend tests: require Python dependencies installed in the active environment.
+  - Backend tests: passing after installing dependencies from `backend/requirements.txt`.

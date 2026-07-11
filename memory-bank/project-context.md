@@ -28,3 +28,13 @@
 - `/api/metrics/alerts`
 - `/api/metrics/b2b`
 - `/api/metrics/b2c`
+
+## Latest verification snapshot
+- Automated checks completed:
+  - `cd backend && pytest -q` -> 15 passed.
+  - `cd frontend && npm test` -> 5 passed.
+  - `cd frontend && npm run lint` -> passing.
+- Functional validation focus to keep iterating:
+  - Confirm KPI values rendered by the dashboard header and KPI cards match the `/api/metrics` payload.
+  - Confirm timeline charts preserve chronological month ordering.
+  - Confirm advanced analytics endpoints remain available and consistent while not yet integrated in main UI flow.
