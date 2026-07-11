@@ -38,3 +38,16 @@
   - Confirm KPI values rendered by the dashboard header and KPI cards match the `/api/metrics` payload.
   - Confirm timeline charts preserve chronological month ordering.
   - Confirm advanced analytics endpoints remain available and consistent while not yet integrated in main UI flow.
+
+## Functional verification log (2026-07-11)
+- UI/API integration evidence:
+  - Main fetch uses `/api/metrics` in `frontend/src/App.tsx`.
+  - Dashboard composes `DashboardHeader`, `KPIRow`, `IncomeOutcomeChart`, and `ProfitPercentChart` in `frontend/src/App.tsx`.
+- Frontend runtime readiness:
+  - `cd frontend && npm run build` -> build successful.
+  - Note: build reports a chunk-size warning (>500kB), not a blocking failure.
+- API smoke checks (FastAPI TestClient):
+  - Verified `GET /health`, `GET /api/metrics`, `GET /api/metrics/facets`, `GET /api/metrics/summary`, `GET /api/metrics/categories/top`, `GET /api/metrics/comparison`, `GET /api/metrics/alerts`, `GET /api/metrics/b2b`, and `GET /api/metrics/b2c`.
+  - Result: 9/9 checks passed using response contracts defined in backend models.
+- Observed product gap:
+  - Header period in `frontend/src/App.tsx` is currently hardcoded as `2024 - Full Year`; backend data year is dynamic.
