@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Skeleton } from '@/components/ui/skeleton'
 import { type MonthlyDataPoint } from '@/lib/financial-types'
 import { formatCurrency } from '@/lib/financial-utils'
+import { useId } from 'react'
 import {
   LineChart,
   Line,
@@ -47,9 +48,12 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
 }
 
 export function IncomeOutcomeChart({ data, loading }: IncomeOutcomeChartProps) {
+  const titleId = useId()
+  const descriptionId = useId()
+
   if (loading) {
     return (
-      <Card className="border-border/60">
+      <Card className="border-border/60" style={{ contentVisibility: 'auto', containIntrinsicSize: '372px' }}>
         <CardHeader className="pb-4">
           <Skeleton className="h-5 w-52" />
           <Skeleton className="h-3 w-64 mt-1" />
@@ -64,19 +68,27 @@ export function IncomeOutcomeChart({ data, loading }: IncomeOutcomeChartProps) {
   const hasData = data.some((d) => d.income > 0 || d.outcome > 0)
 
   return (
-    <Card className="border-border/60">
+    <Card
+      className="border-border/60"
+      style={{ contentVisibility: 'auto', containIntrinsicSize: '372px' }}
+    >
       <CardHeader className="pb-4">
-        <CardTitle className="text-base font-semibold">Income vs. Outcome</CardTitle>
-        <CardDescription>Monthly revenue and expenditure evolution</CardDescription>
+        <CardTitle id={titleId} className="text-base font-semibold">Income vs. Outcome</CardTitle>
+        <CardDescription id={descriptionId}>Monthly revenue and expenditure evolution</CardDescription>
       </CardHeader>
       <CardContent>
         {!hasData ? (
-          <div className="flex h-[280px] items-center justify-center text-muted-foreground text-sm">
+          <div
+            role="status"
+            aria-live="polite"
+            className="flex h-[280px] items-center justify-center text-sm text-muted-foreground"
+          >
             No data available to display
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height={280}>
-            <LineChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+          <figure aria-labelledby={`${titleId} ${descriptionId}`}>
+            <ResponsiveContainer width="100%" height={280}>
+              <LineChart accessibilityLayer data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" strokeOpacity={0.6} />
               <XAxis
                 dataKey="month"
@@ -115,8 +127,12 @@ export function IncomeOutcomeChart({ data, loading }: IncomeOutcomeChartProps) {
                 dot={{ r: 3, fill: 'var(--chart-outcome)', strokeWidth: 0 }}
                 activeDot={{ r: 5, strokeWidth: 0 }}
               />
-            </LineChart>
-          </ResponsiveContainer>
+              </LineChart>
+            </ResponsiveContainer>
+            <figcaption className="sr-only">
+              Line chart that compares monthly income and outcome across the selected period.
+            </figcaption>
+          </figure>
         )}
       </CardContent>
     </Card>

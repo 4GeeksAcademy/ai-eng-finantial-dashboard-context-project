@@ -14,7 +14,7 @@
   --secondary: oklch(0.93 0.01 240);
   --secondary-foreground: oklch(0.2 0.01 240);
   --muted: oklch(0.93 0.01 240);
-  --muted-foreground: oklch(0.5 0.01 240);
+  --muted-foreground: oklch(0.43 0.01 240);
   --accent: oklch(0.93 0.01 240);
   --accent-foreground: oklch(0.2 0.01 240);
   --destructive: oklch(0.577 0.245 27.325);
@@ -51,7 +51,7 @@
   --secondary: oklch(0.24 0.015 240);
   --secondary-foreground: oklch(0.94 0.005 240);
   --muted: oklch(0.24 0.015 240);
-  --muted-foreground: oklch(0.62 0.01 240);
+  --muted-foreground: oklch(0.74 0.01 240);
   --accent: oklch(0.24 0.015 240);
   --accent-foreground: oklch(0.94 0.005 240);
   --destructive: oklch(0.45 0.18 27);
@@ -122,4 +122,28 @@ html,
 body,
 #root {
   min-height: 100%;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -3rem;
+  z-index: 50;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-card);
+  color: var(--color-foreground);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus-visible {
+  top: 1rem;
 }

@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { type MonthlyDataPoint } from '@/lib/financial-types'
+import { useId } from 'react'
 import {
   LineChart,
   Line,
@@ -48,9 +49,12 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
 }
 
 export function ProfitPercentChart({ data, loading }: ProfitPercentChartProps) {
+  const titleId = useId()
+  const descriptionId = useId()
+
   if (loading) {
     return (
-      <Card className="border-border/60">
+      <Card className="border-border/60" style={{ contentVisibility: 'auto', containIntrinsicSize: '372px' }}>
         <CardHeader className="pb-4">
           <Skeleton className="h-5 w-52" />
           <Skeleton className="h-3 w-64 mt-1" />
@@ -65,19 +69,27 @@ export function ProfitPercentChart({ data, loading }: ProfitPercentChartProps) {
   const hasData = data.some((d) => d.profitPercent !== 0)
 
   return (
-    <Card className="border-border/60">
+    <Card
+      className="border-border/60"
+      style={{ contentVisibility: 'auto', containIntrinsicSize: '372px' }}
+    >
       <CardHeader className="pb-4">
-        <CardTitle className="text-base font-semibold">Profit Margin %</CardTitle>
-        <CardDescription>Monthly profit as a percentage of total income</CardDescription>
+        <CardTitle id={titleId} className="text-base font-semibold">Profit Margin %</CardTitle>
+        <CardDescription id={descriptionId}>Monthly profit as a percentage of total income</CardDescription>
       </CardHeader>
       <CardContent>
         {!hasData ? (
-          <div className="flex h-[280px] items-center justify-center text-muted-foreground text-sm">
+          <div
+            role="status"
+            aria-live="polite"
+            className="flex h-[280px] items-center justify-center text-sm text-muted-foreground"
+          >
             No data available to display
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height={280}>
-            <LineChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+          <figure aria-labelledby={`${titleId} ${descriptionId}`}>
+            <ResponsiveContainer width="100%" height={280}>
+              <LineChart accessibilityLayer data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" strokeOpacity={0.6} />
               <XAxis
                 dataKey="month"
@@ -104,8 +116,12 @@ export function ProfitPercentChart({ data, loading }: ProfitPercentChartProps) {
                 dot={{ r: 3, fill: 'var(--chart-profit)', strokeWidth: 0 }}
                 activeDot={{ r: 5, strokeWidth: 0 }}
               />
-            </LineChart>
-          </ResponsiveContainer>
+              </LineChart>
+            </ResponsiveContainer>
+            <figcaption className="sr-only">
+              Line chart that shows monthly profit percentage for the selected period.
+            </figcaption>
+          </figure>
         )}
       </CardContent>
     </Card>
