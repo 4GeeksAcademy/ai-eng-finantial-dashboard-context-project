@@ -1,0 +1,9 @@
+{
+  "name": "ai-eng-financial-dashboard-context-project",
+  "private": true,
+  "scripts": {
+    "build:frontend": "npm --prefix frontend run build",
+    "lint:frontend": "npm --prefix frontend run lint",
+    "test:frontend": "npm --prefix frontend run test"
+  }
+}

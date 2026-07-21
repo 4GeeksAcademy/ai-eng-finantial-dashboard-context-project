@@ -51,7 +51,7 @@
   --secondary: oklch(0.24 0.015 240);
   --secondary-foreground: oklch(0.94 0.005 240);
   --muted: oklch(0.24 0.015 240);
-  --muted-foreground: oklch(0.62 0.01 240);
+  --muted-foreground: oklch(0.74 0.01 240);
   --accent: oklch(0.24 0.015 240);
   --accent-foreground: oklch(0.94 0.005 240);
   --destructive: oklch(0.45 0.18 27);
@@ -114,6 +114,11 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  :where(a, button, input, select, textarea, [role='button'], [tabindex]):focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
   }
 }
 

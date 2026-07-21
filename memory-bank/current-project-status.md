@@ -39,6 +39,11 @@ Gaps:
 3. Harden runtime configuration for environments (CORS allow-list, env-driven settings).
 4. Expand documentation for deployment assumptions and API contract examples.
 
+## Assignment Skills Update
+- Applied skill: frontend performance optimization via lazy loading/code splitting for chart-heavy modules in App.
+- Justification: Defers loading Recharts-based components until needed, reducing initial JavaScript payload and improving first render responsiveness for dashboard users.
+- Code reference: frontend/src/App.tsx (lazy imports + Suspense fallbacks with inline justification comment).
+
 ---
 Evidence sources:
 - /workspaces/ai-en2-Ven-financial-dashboard-context-project/docker-compose.yml
