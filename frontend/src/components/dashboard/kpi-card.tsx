@@ -56,8 +56,8 @@ export function KPICard({ label, value, helperText, icon: Icon, variant, loading
           <span className="text-sm font-medium text-muted-foreground tracking-wide uppercase text-pretty">
             {label}
           </span>
-          <span className={cn('p-1.5 rounded-lg', styles.badge)}>
-            <Icon size={16} className={styles.icon} />
+          <span className={cn('p-1.5 rounded-lg', styles.badge)} aria-hidden="true">
+            <Icon size={16} className={styles.icon} aria-hidden="true" focusable="false" />
           </span>
         </div>
         <p className="text-3xl font-semibold tracking-tight text-foreground">{value}</p>

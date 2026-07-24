@@ -39,6 +39,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
         <span
           className="inline-block h-2 w-2 rounded-full"
           style={{ backgroundColor: 'var(--chart-profit)' }}
+          aria-hidden="true"
         />
         <span className="text-muted-foreground">Profit margin:</span>
         <span className="font-medium text-foreground ml-auto pl-4">{value.toFixed(1)}%</span>
@@ -65,19 +66,28 @@ export function ProfitPercentChart({ data, loading }: ProfitPercentChartProps) {
   const hasData = data.some((d) => d.profitPercent !== 0)
 
   return (
-    <Card className="border-border/60">
+    <Card className="border-border/60" role="group" aria-labelledby="profit-margin-title" aria-describedby="profit-margin-description">
       <CardHeader className="pb-4">
-        <CardTitle className="text-base font-semibold">Profit Margin %</CardTitle>
-        <CardDescription>Monthly profit as a percentage of total income</CardDescription>
+        <CardTitle id="profit-margin-title" className="text-base font-semibold">Profit Margin %</CardTitle>
+        <CardDescription id="profit-margin-description">Monthly profit as a percentage of total income</CardDescription>
       </CardHeader>
       <CardContent>
+        <p className="sr-only" id="profit-margin-sr-description">
+          Line chart showing monthly profit margin percentages with a zero percent reference baseline.
+        </p>
         {!hasData ? (
           <div className="flex h-[280px] items-center justify-center text-muted-foreground text-sm">
             No data available to display
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={280}>
-            <LineChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+            <LineChart
+              data={data}
+              margin={{ top: 4, right: 8, left: 0, bottom: 0 }}
+              role="img"
+              aria-label="Profit margin percentage by month"
+              aria-describedby="profit-margin-sr-description"
+            >
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" strokeOpacity={0.6} />
               <XAxis
                 dataKey="month"

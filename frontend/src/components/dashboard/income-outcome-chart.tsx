@@ -37,7 +37,11 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
       <p className="font-semibold text-foreground mb-2">{label}</p>
       {payload.map((entry) => (
         <div key={entry.name} className="flex items-center gap-2 py-0.5">
-          <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: entry.color }} />
+          <span
+            className="inline-block h-2 w-2 rounded-full"
+            style={{ backgroundColor: entry.color }}
+            aria-hidden="true"
+          />
           <span className="text-muted-foreground capitalize">{entry.name}:</span>
           <span className="font-medium text-foreground ml-auto pl-4">{formatCurrency(entry.value)}</span>
         </div>
@@ -64,19 +68,28 @@ export function IncomeOutcomeChart({ data, loading }: IncomeOutcomeChartProps) {
   const hasData = data.some((d) => d.income > 0 || d.outcome > 0)
 
   return (
-    <Card className="border-border/60">
+    <Card className="border-border/60" role="group" aria-labelledby="income-outcome-title" aria-describedby="income-outcome-description">
       <CardHeader className="pb-4">
-        <CardTitle className="text-base font-semibold">Income vs. Outcome</CardTitle>
-        <CardDescription>Monthly revenue and expenditure evolution</CardDescription>
+        <CardTitle id="income-outcome-title" className="text-base font-semibold">Income vs. Outcome</CardTitle>
+        <CardDescription id="income-outcome-description">Monthly revenue and expenditure evolution</CardDescription>
       </CardHeader>
       <CardContent>
+        <p className="sr-only" id="income-outcome-sr-description">
+          Line chart comparing monthly income and outcome values from January through December.
+        </p>
         {!hasData ? (
           <div className="flex h-[280px] items-center justify-center text-muted-foreground text-sm">
             No data available to display
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={280}>
-            <LineChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+            <LineChart
+              data={data}
+              margin={{ top: 4, right: 8, left: 0, bottom: 0 }}
+              role="img"
+              aria-label="Income and outcome by month"
+              aria-describedby="income-outcome-sr-description"
+            >
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" strokeOpacity={0.6} />
               <XAxis
                 dataKey="month"
