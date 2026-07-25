@@ -1,7 +1,7 @@
 # Current Project Status
 
 ## Overall Status
-The project is in a functional baseline state suitable for development, demos, and educational use. Core backend endpoints are implemented and frontend dashboard rendering is wired end-to-end.
+The project is in a functional baseline state suitable for development, demos, and educational use. Core backend endpoints are implemented and frontend dashboard rendering is wired end-to-end. On branch `feature/agent-skills`, accessibility (WCAG-oriented) and React performance skill applications have been applied to the frontend.
 
 ## What Is Implemented
 - Full local containerized startup path.
@@ -16,12 +16,37 @@ The project is in a functional baseline state suitable for development, demos, a
   - /api/metrics/b2c
 - Frontend KPI and chart rendering based on fetched data.
 - Utility-level financial calculations for KPIs and monthly series.
+- Agent skills installed for Cursor:
+  - `.agents/skills/accessibility` (addyosmani/web-quality-skills)
+  - `.agents/skills/vercel-react-best-practices` (vercel-labs/agent-skills)
+  - `.agents/skills/web-quality-audit` (addyosmani/web-quality-skills)
+- Project-specific quality workflow in `.skills/financial-dashboard-quality/SKILL.md`.
+- Cursor-native rule mirrors in `.cursor/rules/` synced with `.agents/rules`.
+
+## Frontend Skill Applications (2026-07-24)
+Accessibility:
+- Skip link, `role="alert"` errors, `aria-busy` loading regions, decorative `aria-hidden` icons.
+- Chart text alternatives via visually hidden data tables.
+- `:focus-visible`, `prefers-reduced-motion`, improved muted text contrast tokens.
+
+Performance (`vercel-react-best-practices`):
+- Lazy-loaded chart chunks (`React.lazy` + `Suspense`) — main bundle ~188 kB; Recharts split out; Vite >500 kB warning cleared.
+- Derived KPI/monthly metrics during render (no redundant derived state in effects).
+- Single-pass KPI aggregation in `financial-utils.ts`.
+
+Web quality (`web-quality-audit`):
+- Added a descriptive page title and meta description after a cross-category
+  performance, accessibility, SEO, and best-practices audit.
+- Recorded findings and deployment-only follow-ups in
+  `memory-bank/web-quality-audit.md`.
 
 ## Quality and Testing Snapshot
 Strengths:
 - Backend test suite covers multiple endpoint behaviors and filter combinations.
-- Frontend utility transformations are unit-tested.
+- Frontend utility transformations are unit-tested (5/5 passing after KPI loop change).
 - Type and lint tooling are configured with modern defaults.
+- Production build passes without the previous chunk-size warning.
+- Frontend lint, tests, and build all pass after all three skill applications.
 
 Gaps:
 - Frontend lacks component/integration tests for data fetch, loading state, and error state.
@@ -33,11 +58,10 @@ Gaps:
 - Medium risk for scaling maintainability without backend modularization.
 - Medium risk for production deployment security posture without CORS hardening and environment-specific policies.
 
-## Recommended Next Actions (Non-invasive)
+## Recommended Next Actions
 1. Add frontend component tests for App and dashboard rendering states.
 2. Introduce backend module separation (schemas/services/routers) while preserving endpoint contracts.
 3. Harden runtime configuration for environments (CORS allow-list, env-driven settings).
-4. Expand documentation for deployment assumptions and API contract examples.
 
 ## Assignment Skills Update
 - Applied skill: frontend performance optimization via lazy loading/code splitting for chart-heavy modules in App.
@@ -46,9 +70,13 @@ Gaps:
 
 ---
 Evidence sources:
-- /workspaces/ai-en2-Ven-financial-dashboard-context-project/docker-compose.yml
-- /workspaces/ai-en2-Ven-financial-dashboard-context-project/backend/app/main.py
-- /workspaces/ai-en2-Ven-financial-dashboard-context-project/backend/app/routes.py
-- /workspaces/ai-en2-Ven-financial-dashboard-context-project/backend/tests/test_routes.py
-- /workspaces/ai-en2-Ven-financial-dashboard-context-project/frontend/src/App.tsx
-- /workspaces/ai-en2-Ven-financial-dashboard-context-project/frontend/src/lib/financial-utils.test.ts
+- memory-bank/evaluation.md
+- frontend/src/App.tsx
+- frontend/src/index.css
+- frontend/src/lib/financial-utils.ts
+- frontend/src/components/dashboard/*
+- .agents/skills/*
+- skills-lock.json
+- docker-compose.yml
+- backend/app/main.py
+- backend/app/routes.py
