@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { type MonthlyDataPoint } from '@/lib/financial-types'
@@ -50,7 +51,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   )
 }
 
-export function IncomeOutcomeChart({ data, loading }: IncomeOutcomeChartProps) {
+export const IncomeOutcomeChart = memo(function IncomeOutcomeChart({ data, loading }: IncomeOutcomeChartProps) {
   if (loading) {
     return (
       <Card className="border-border/60">
@@ -134,4 +135,4 @@ export function IncomeOutcomeChart({ data, loading }: IncomeOutcomeChartProps) {
       </CardContent>
     </Card>
   )
-}
+})
