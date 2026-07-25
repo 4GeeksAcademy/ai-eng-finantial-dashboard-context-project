@@ -182,7 +182,7 @@ element.addEventListener('keydown', (e) => {
 });
 ```
 
-**No keyboard traps.** Users must be able to Tab into and out of every component. Use the [modal focus trap pattern](references/A11Y-PATTERNS.md#modal-focus-trap) for dialogs—the native `<dialog>` element handles this automatically.
+**No keyboard traps.** Users must be able to Tab into and out of every component. Use the [Accessibility code patterns](references/A11Y-PATTERNS.md) guide ("Modal focus trap") for dialogs—the native `<dialog>` element handles this automatically.
 
 ### Focus visible (2.4.7)
 
@@ -225,7 +225,7 @@ When an element receives keyboard focus, it must not be entirely hidden by other
 
 ### Skip links (2.4.1)
 
-Provide a skip link so keyboard users can bypass repetitive navigation. See the [skip link pattern](references/A11Y-PATTERNS.md#skip-link) for full markup and styles.
+Provide a skip link so keyboard users can bypass repetitive navigation. See [Accessibility code patterns](references/A11Y-PATTERNS.md) ("Skip link") for full markup and styles.
 
 ### Target size (2.5.8) — new in 2.2
 
@@ -253,7 +253,7 @@ input[type="radio"] + label {
 
 ### Dragging movements (2.5.7) — new in 2.2
 
-Any action that requires dragging must have a single-pointer alternative (e.g., buttons, inputs). See the [dragging movements pattern](references/A11Y-PATTERNS.md#dragging-movements) for a sortable-list example.
+Any action that requires dragging must have a single-pointer alternative (e.g., buttons, inputs). See [Accessibility code patterns](references/A11Y-PATTERNS.md) ("Dragging movements") for a sortable-list example.
 
 ### Timing (2.2)
 
@@ -324,11 +324,11 @@ If a help mechanism (contact info, chat widget, FAQ link, self-help option) is r
 
 ### Form labels (3.3.2)
 
-Every input needs a programmatically associated label. See the [form labels pattern](references/A11Y-PATTERNS.md#form-labels) for explicit, implicit, and instructional examples.
+Every input needs a programmatically associated label. See [Accessibility code patterns](references/A11Y-PATTERNS.md) ("Form labels") for explicit, implicit, and instructional examples.
 
 ### Error handling (3.3.1, 3.3.3)
 
-Announce errors to screen readers with `role="alert"` or `aria-live`, set `aria-invalid="true"` on invalid fields, and focus the first error on submit. See the [error handling pattern](references/A11Y-PATTERNS.md#error-handling) for full markup and JS.
+Announce errors to screen readers with `role="alert"` or `aria-live`, set `aria-invalid="true"` on invalid fields, and focus the first error on submit. See [Accessibility code patterns](references/A11Y-PATTERNS.md) ("Error handling") for full markup and JS.
 
 ### Redundant entry (3.3.7) — new in 2.2
 
@@ -383,11 +383,11 @@ Login flows must not rely on cognitive function tests (e.g., remembering a passw
 <label><input type="checkbox"> Option</label>
 ```
 
-**When ARIA is needed,** use the correct roles and states. See the [ARIA tabs pattern](references/A11Y-PATTERNS.md#aria-tabs) for a complete tablist example.
+**When ARIA is needed,** use the correct roles and states. See [Accessibility code patterns](references/A11Y-PATTERNS.md) ("ARIA tabs") for a complete tablist example.
 
 ### Live regions (4.1.3)
 
-Use `aria-live` regions to announce dynamic content changes without moving focus. See the [live regions pattern](references/A11Y-PATTERNS.md#live-regions-and-notifications) for markup and a `showNotification()` helper.
+Use `aria-live` regions to announce dynamic content changes without moving focus. See [Accessibility code patterns](references/A11Y-PATTERNS.md) ("Live regions and notifications") for markup and a `showNotification()` helper.
 
 ---
 
@@ -413,7 +413,7 @@ axe https://example.com
 - [ ] **Focus order:** Logical and follows visual order
 - [ ] **Target size:** Interactive elements meet 24×24px minimum
 
-See the [screen reader commands reference](references/A11Y-PATTERNS.md#screen-reader-commands) for VoiceOver and NVDA shortcuts.
+See [Accessibility code patterns](references/A11Y-PATTERNS.md) ("Screen reader commands") for VoiceOver and NVDA shortcuts.
 
 ---
 
@@ -445,6 +445,6 @@ See the [screen reader commands reference](references/A11Y-PATTERNS.md#screen-re
 - [WCAG 2.2 Quick Reference](https://www.w3.org/WAI/WCAG22/quickref/)
 - [WAI-ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/)
 - [Deque axe Rules](https://dequeuniversity.com/rules/axe/)
-- [Web Quality Audit](../web-quality-audit/SKILL.md)
+- [Accessibility patterns reference](references/A11Y-PATTERNS.md)
 - [WCAG criteria reference](references/WCAG.md)
 - [Accessibility code patterns](references/A11Y-PATTERNS.md)
