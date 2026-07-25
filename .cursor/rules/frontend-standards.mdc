@@ -1,0 +1,17 @@
+---
+description: Frontend coding standards for React/TypeScript (pure calculations, UI behavior tests)
+globs: frontend/src/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Frontend Standards
+
+Canonical mirror: `.agents/rules/coding-standards.md` — keep both in sync when changing these rules.
+
+## Rule G2: Keep business calculations in pure reusable functions
+- Financial calculations and transformations should remain in pure functions outside UI rendering code.
+- UI components should consume computed results rather than embed heavy calculation logic.
+
+## Rule B3: Require UI behavior tests for critical user states
+- Frontend changes that affect data loading, error handling, or rendering logic must include component or integration tests.
+- Utility-only tests are insufficient when UI behavior can regress.

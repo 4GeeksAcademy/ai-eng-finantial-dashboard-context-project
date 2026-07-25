@@ -12,4 +12,6 @@ Agents working on this project **must**:
   `./memory-bank`  
   _(if the directory exists)_
 
+Cursor-native rule mirrors live in `./.cursor/rules/` (`.mdc` files with frontmatter). Keep those mirrors in sync with `./.agents/rules` whenever coding standards change.
+
 Before taking action (analyzing code, modifying files, or generating outputs), always review the latest files in these locations to ensure compliance with project conventions, context, and operational constraints.
