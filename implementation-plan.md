@@ -56,42 +56,29 @@ Este Plan de Implementación ha sido elaborado utilizando el **Método de los Tr
 
 ---
 
-### Fase 3: Institucionalización de Reglas (`.agents/rules/`)
+### Fase 3: Institucionalización de Reglas (`.agents/rules/`) ✅ (COMPLETADA)
 
-Sintetizando los requerimientos de gobernanza de los 3 expertos, se crearán los siguientes estándares:
+Sintetizando los requerimientos de gobernanza de los 3 expertos, se han creado e institucionalizado los siguientes estándares:
 
-- **`.agents/rules/01-api-naming-conventions.md`**
-  - Estándar RESTful obligatorio para FastAPI: endpoints en plural, nombres en minúsculas, `snake_case` para parámetros query y respuestas JSON.
-  - Reutilización obligatoria de funciones de filtrado.
+- ✅ **`.agents/rules/01-api-naming-conventions.md`**: Convenciones RESTful para FastAPI (endpoints en plural, minúsculas, `snake_case` para query parameters y respuestas JSON).
+- ✅ **`.agents/rules/02-frontend-structure.md`**: Estándar de separación React: prohibición de `fetch` directo dentro de componentes visuales, aislamiento en `lib/services/` o custom hooks, y prohibición estricta de `any`.
+- ✅ **`.agents/rules/03-error-handling.md`**: Protocolo defensivo: `HTTPException` explícitas en FastAPI y manejo de estados de carga/error tipados en React.
 
-- **`.agents/rules/02-frontend-structure.md`**
-  - Separación estricta en React: prohibición de `fetch` o llamadas HTTP dentro de componentes de UI (`App.tsx`).
-  - Encapsulamiento obligatorio en la capa `lib/services/` o Custom Hooks. Prohibición total del uso de `any` en TypeScript.
-
-- **`.agents/rules/03-error-handling.md`**
-  - Manejo unificado de excepciones: uso obligatorio de `HTTPException` estructuradas en FastAPI.
-  - Gestión explícita de estados de carga (`loading`) y errores visuales con opción de reintento en React.
-
-* **Entregable de Git:**
-  `git commit -m "feat(phase-3): establish agent governance rules in .agents/rules"`
+* ✅ **Entregable de Git:**
+  `git commit -m "(FASE3): institucionalizacion de reglas de gobernanza en .agents/rules"` (Completado y pusheado a origin/main)
 
 ---
 
-### Fase 4: Construcción de la Memoria Operativa (`memory-bank/`)
+### Fase 4: Construcción del Banco de Memoria (`memory-bank/`) ✅ (COMPLETADA)
 
-Garantía del Tech Lead para institucionalizar el conocimiento del repositorio:
+Garantía del Tech Lead para la preservación e institucionalización del conocimiento:
 
-- **`memory-bank/overview.md`**
-  - Documentación de la arquitectura del producto y los flujos cliente-servidor verificados empíricamente.
+- ✅ **`memory-bank/overview.md`**: Visión del producto y flujo cliente-servidor extraído del comportamiento verificado.
+- ✅ **`memory-bank/tech_stack.md`**: Inventario técnico verificado: React 19.2, Vite 8.0, Tailwind CSS 4.2, Recharts 3.8, Vitest 4.1, FastAPI, Uvicorn, Pytest.
+- ✅ **`memory-bank/project_status.md`**: Mapa de deuda técnica, estado del repositorio y las 3 prioridades de desarrollo futuras.
 
-- **`memory-bank/tech_stack.md`**
-  - Inventario auditado con versiones exactas extraídas de `frontend/package.json` (React 19.2, Vite 8.0, Tailwind CSS 4.2, Recharts 3.8, Vitest 4.1) y `backend/requirements.txt` (FastAPI, Uvicorn, Pytest).
-
-- **`memory-bank/project_status.md`**
-  - Mapa del estado actual, deuda técnica identificada y las 3 prioridades inmediatas de ingeniería.
-
-* **Entregable de Git:**
-  `git commit -m "docs(phase-4): establish project memory-bank"`
+* ✅ **Entregable de Git:**
+  `git commit -m "(FASE4): construccion del banco de memoria operativa en memory-bank"` (Completado)
 
 ---
 
