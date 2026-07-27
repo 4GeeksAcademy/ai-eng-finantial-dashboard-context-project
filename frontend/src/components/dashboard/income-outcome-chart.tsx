@@ -72,7 +72,7 @@ export const IncomeOutcomeChart = memo(function IncomeOutcomeChart({ data, loadi
     <Card className="border-border/60" role="group" aria-labelledby="income-outcome-title" aria-describedby="income-outcome-description">
       <CardHeader className="pb-4">
         <CardTitle id="income-outcome-title" className="text-base font-semibold">Income vs. Outcome</CardTitle>
-        <CardDescription id="income-outcome-description">Monthly revenue and expenditure evolution</CardDescription>
+        <CardDescription id="income-outcome-description">Monthly income and outcome evolution</CardDescription>
       </CardHeader>
       <CardContent>
         <p className="sr-only" id="income-outcome-sr-description">
@@ -102,8 +102,8 @@ export const IncomeOutcomeChart = memo(function IncomeOutcomeChart({ data, loadi
                 tick={{ fontSize: 11, fill: 'var(--color-muted-foreground)' }}
                 axisLine={false}
                 tickLine={false}
-                tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
-                width={48}
+                tickFormatter={(v) => formatCurrency(v)}
+                width={78}
               />
               <Tooltip content={<CustomTooltip />} />
               <Legend

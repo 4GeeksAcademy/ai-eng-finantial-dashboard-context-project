@@ -31,3 +31,9 @@
 - Improve production security settings.
 - Pin dependency versions.
 - Strengthen validation and runtime configuration.
+## Agent Skills Applied
+
+- Accessibility: Improved ARIA attributes, keyboard navigation, alt text, and accessibility compliance.
+- Vercel React Best Practices: Applied React performance and code quality improvements.
+- Performance: Optimized dashboard performance based on the performance skill.
+- Financial Dashboard Consistency (Custom Skill): Added a custom skill to ensure consistent formatting of financial values, percentages, dates, and labels across the dashboard. Verified the dashboard follows these guidelines.
