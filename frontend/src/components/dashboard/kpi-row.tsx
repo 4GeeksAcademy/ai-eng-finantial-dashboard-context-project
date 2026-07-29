@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { KPICard } from './kpi-card'
 import { type KPIMetrics } from '@/lib/financial-types'
 import { formatCurrency, formatPercent } from '@/lib/financial-utils'
@@ -8,7 +9,7 @@ interface KPIRowProps {
   loading?: boolean
 }
 
-export function KPIRow({ metrics, loading }: KPIRowProps) {
+export const KPIRow = memo(function KPIRow({ metrics, loading }: KPIRowProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
       <KPICard
@@ -45,4 +46,4 @@ export function KPIRow({ metrics, loading }: KPIRowProps) {
       />
     </div>
   )
-}
+})
