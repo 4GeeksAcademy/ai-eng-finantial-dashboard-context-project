@@ -2,6 +2,7 @@ import { memo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { type MonthlyDataPoint } from '@/lib/financial-types'
+import { formatPercent } from '@/lib/financial-utils'
 import {
   LineChart,
   Line,
@@ -73,7 +74,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
           style={{ backgroundColor: 'var(--chart-profit)' }}
         />
         <span className="text-muted-foreground">Profit margin:</span>
-        <span className="font-medium text-foreground ml-auto pl-4">{value.toFixed(1)}%</span>
+        <span className="font-medium text-foreground ml-auto pl-4">{formatPercent(value)}</span>
       </div>
     </div>
   )
@@ -97,7 +98,7 @@ function ProfitMarginSummary({ data }: { data: MonthlyDataPoint[] }) {
           {data.map((row) => (
             <tr key={row.month} className="border-b border-border/60 text-foreground">
               <th scope="row" className="py-1.5 pr-3 font-normal">{row.month}</th>
-              <td className="py-1.5 text-right tabular-nums">{row.profitPercent.toFixed(1)}%</td>
+              <td className="py-1.5 text-right tabular-nums">{formatPercent(row.profitPercent)}</td>
             </tr>
           ))}
         </tbody>
