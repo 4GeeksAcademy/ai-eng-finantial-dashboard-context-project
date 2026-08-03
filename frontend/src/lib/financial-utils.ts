@@ -76,5 +76,32 @@ export function formatCurrency(value: number): string {
 }
 
 export function formatPercent(value: number): string {
-  return `${value.toFixed(1)}%`;
+  return new Intl.NumberFormat("en-US", {
+    style: "percent",
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  }).format(value / 100);
+}
+
+export function computePeriodLabel(movements: FinancialMovement[]): string {
+  if (movements.length === 0) return "No Data";
+
+  const dates = movements
+    .map((m) => new Date(m.create_date))
+    .filter((d) => !isNaN(d.getTime()))
+    .sort((a, b) => a.getTime() - b.getTime());
+
+  if (dates.length === 0) return "No Data";
+
+  const startDate = dates[0];
+  const endDate = dates[dates.length - 1];
+
+  const startYear = startDate.getFullYear();
+  const endYear = endDate.getFullYear();
+
+  if (startYear === endYear) {
+    return `${startYear} — Full Year`;
+  }
+
+  return `${startYear} — ${endYear}`;
 }
