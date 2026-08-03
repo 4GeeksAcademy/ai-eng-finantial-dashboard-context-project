@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { type MonthlyDataPoint } from '@/lib/financial-types'
@@ -29,6 +30,37 @@ interface CustomTooltipProps {
   payload?: TooltipPayload[]
   label?: string
 }
+
+const CHART_MARGIN = { top: 4, right: 8, left: 0, bottom: 0 } as const
+
+const X_AXIS_TICK = { fontSize: 12, fill: 'var(--color-muted-foreground)' } as const
+
+const Y_AXIS_TICK = { fontSize: 11, fill: 'var(--color-muted-foreground)' } as const
+
+const INCOME_DOT = { r: 3, fill: 'var(--chart-income)', strokeWidth: 0 } as const
+
+const OUTCOME_DOT = { r: 3, fill: 'var(--chart-outcome)', strokeWidth: 0 } as const
+
+const ACTIVE_DOT = { r: 5, strokeWidth: 0 } as const
+
+const loadingSkeleton = (
+  <Card className="border-border/60" role="status" aria-busy="true">
+    <span className="sr-only">Loading income versus outcome chart</span>
+    <CardHeader className="pb-4">
+      <Skeleton className="h-5 w-52" />
+      <Skeleton className="h-3 w-64 mt-1" />
+    </CardHeader>
+    <CardContent>
+      <Skeleton className="h-[280px] w-full rounded-lg" />
+    </CardContent>
+  </Card>
+)
+
+const emptyState = (
+  <div className="flex h-[280px] items-center justify-center text-muted-foreground text-sm">
+    No data available to display
+  </div>
+)
 
 function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   if (!active || !payload?.length) return null
@@ -75,20 +107,19 @@ function MonthlyDataSummary({ data }: { data: MonthlyDataPoint[] }) {
   )
 }
 
-export function IncomeOutcomeChart({ data, loading }: IncomeOutcomeChartProps) {
+function formatIncomeAxisTick(v: number) {
+  return `$${(v / 1000).toFixed(0)}k`
+}
+
+function formatLegendLabel(value: string) {
+  return <span className="text-xs text-muted-foreground capitalize">{value}</span>
+}
+
+const customTooltip = <CustomTooltip />
+
+function IncomeOutcomeChartComponent({ data, loading }: IncomeOutcomeChartProps) {
   if (loading) {
-    return (
-      <Card className="border-border/60" role="status" aria-busy="true">
-        <span className="sr-only">Loading income versus outcome chart</span>
-        <CardHeader className="pb-4">
-          <Skeleton className="h-5 w-52" />
-          <Skeleton className="h-3 w-64 mt-1" />
-        </CardHeader>
-        <CardContent>
-          <Skeleton className="h-[280px] w-full rounded-lg" />
-        </CardContent>
-      </Card>
-    )
+    return loadingSkeleton
   }
 
   const hasData = data.some((d) => d.income > 0 || d.outcome > 0)
@@ -101,9 +132,7 @@ export function IncomeOutcomeChart({ data, loading }: IncomeOutcomeChartProps) {
       </CardHeader>
       <CardContent>
         {!hasData ? (
-          <div className="flex h-[280px] items-center justify-center text-muted-foreground text-sm">
-            No data available to display
-          </div>
+          emptyState
         ) : (
           <>
             <div
@@ -111,22 +140,22 @@ export function IncomeOutcomeChart({ data, loading }: IncomeOutcomeChartProps) {
               aria-label="Line chart showing monthly income versus outcome over the selected period"
             >
               <ResponsiveContainer width="100%" height={280}>
-                <LineChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+                <LineChart data={data} margin={CHART_MARGIN}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" strokeOpacity={0.6} />
                   <XAxis
                     dataKey="month"
-                    tick={{ fontSize: 12, fill: 'var(--color-muted-foreground)' }}
+                    tick={X_AXIS_TICK}
                     axisLine={false}
                     tickLine={false}
                   />
                   <YAxis
-                    tick={{ fontSize: 11, fill: 'var(--color-muted-foreground)' }}
+                    tick={Y_AXIS_TICK}
                     axisLine={false}
                     tickLine={false}
-                    tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+                    tickFormatter={formatIncomeAxisTick}
                     width={48}
                   />
-                  <Tooltip content={<CustomTooltip />} />
+                  <Tooltip content={customTooltip} />
                   {/*
                     Recharts' default Legend toggles series via mouse click on non-focusable
                     spans, with no built-in keyboard path. Making it fully operable would
@@ -134,19 +163,15 @@ export function IncomeOutcomeChart({ data, loading }: IncomeOutcomeChartProps) {
                     Instead, the visible MonthlyDataSummary table below provides the same
                     values in a keyboard- and screen-reader-accessible form.
                   */}
-                  <Legend
-                    formatter={(value) => (
-                      <span className="text-xs text-muted-foreground capitalize">{value}</span>
-                    )}
-                  />
+                  <Legend formatter={formatLegendLabel} />
                   <Line
                     type="monotone"
                     dataKey="income"
                     name="income"
                     stroke="var(--chart-income)"
                     strokeWidth={2}
-                    dot={{ r: 3, fill: 'var(--chart-income)', strokeWidth: 0 }}
-                    activeDot={{ r: 5, strokeWidth: 0 }}
+                    dot={INCOME_DOT}
+                    activeDot={ACTIVE_DOT}
                   />
                   <Line
                     type="monotone"
@@ -154,8 +179,8 @@ export function IncomeOutcomeChart({ data, loading }: IncomeOutcomeChartProps) {
                     name="outcome"
                     stroke="var(--chart-outcome)"
                     strokeWidth={2}
-                    dot={{ r: 3, fill: 'var(--chart-outcome)', strokeWidth: 0 }}
-                    activeDot={{ r: 5, strokeWidth: 0 }}
+                    dot={OUTCOME_DOT}
+                    activeDot={ACTIVE_DOT}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -167,3 +192,5 @@ export function IncomeOutcomeChart({ data, loading }: IncomeOutcomeChartProps) {
     </Card>
   )
 }
+
+export const IncomeOutcomeChart = memo(IncomeOutcomeChartComponent)
