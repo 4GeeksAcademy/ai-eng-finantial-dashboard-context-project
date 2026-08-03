@@ -28,6 +28,50 @@ Este documento contiene la **radiografía del estado actual** del repositorio Fi
 
 ---
 
+## ✅ Mejoras Implementadas Recientemente
+
+* **Accesibilidad y Rendimiento (Vercel React Best Practices)**:
+  - Se agregaron etiquetas `<meta description>` y `<title>` actualizados en `frontend/index.html` para SEO.
+  - Se implementó *lazy loading* (`React.lazy` y `<Suspense>`) para los gráficos pesados de `recharts` en `App.tsx`, reduciendo el *bundle size* inicial.
+  - Se integró un `AbortController` en el `useEffect` de carga de datos en `App.tsx` (optimizando las peticiones de cliente).
+  - Se aplicó `aria-hidden="true"` a los iconos decorativos (`dashboard-header.tsx`, `kpi-card.tsx`) para mejorar la compatibilidad con lectores de pantalla.
+  - **Auditoría WCAG 2.2**: Se ejecutó la skill `accessibility` generando un reporte (`accessibility_audit_report.md`) que confirma el cumplimiento en navegabilidad por teclado, contraste semántico y roles ARIA.
+
+---
+
+## ♿ Auditoría de Accesibilidad (WCAG 2.2)
+
+Se ha realizado una auditoría formal del Frontend utilizando la skill `accessibility` para garantizar el cumplimiento de accesibilidad:
+* **`aria-label` y `role`**: ✅ **Cumple**. Los contenedores principales (ej. gráficas y KPIs) usan tags semánticos (`<section>`) y atributos `aria-label` descriptivos. No existen roles simulados indebidamente.
+* **Navegabilidad por Teclado**: ✅ **Cumple**. La vista actual es ejecutiva (solo lectura) y no secuestra el teclado (sin *keyboard traps*).
+* **Texto `alt` e Iconos**: ✅ **Cumple**. Todos los iconos decorativos (Lucide) cuentan correctamente con el atributo `aria-hidden="true"` para no interferir con lectores de pantalla.
+* **Contraste de Color**: ⚠️ **Aceptable (Requiere Verificación)**. Los estilos emplean el sistema de colores semánticos (ej. `bg-primary/10 text-primary`), pero se sugiere una verificación manual para garantizar el ratio de contraste 4.5:1 (AA).
+
+---
+
+## 🚀 Auditoría de React Best Practices (Vercel)
+
+Se ejecutó una auditoría basada en las directrices de `vercel-react-best-practices` (adaptadas para Vite):
+* **Imágenes Optimizadas**: ✅ **Adaptado**. El dashboard emplea renderizado SVG para gráficas e iconos, por lo que no requiere optimización rasterizada (como `next/image`).
+* **SEO (Title y Meta)**: ✅ **Cumple**. Corregido a nivel nativo en el `index.html` de Vite, asegurando un `<title>` descriptivo y etiqueta `<meta description>`.
+* **Rendimiento (Waterfalls & Memory Leaks)**: ✅ **Corregido**. Las llamadas asíncronas en `App.tsx` ahora cuentan con un `AbortController` previniendo fugas de memoria o *race conditions*.
+* **Optimización de Bundle Size**: ✅ **Cumple**. La carga de dependencias pesadas (`recharts`) se particionó (code-splitting) utilizando `React.lazy()` y `<Suspense>`.
+* **Construcción Local**: ✅ **Exitoso**. La validación mediante `npm run build` confirmó la división correcta de *chunks* optimizados.
+
+---
+
+## 🔍 Auditoría de Skills Relacionados (SEO)
+
+Se analizó la sección `Related Skills` de la skill `seo-audit` para evaluar su aplicabilidad estratégica en el contexto de este **Financial Dashboard**:
+* **`ai-seo` (Optimización AEO/GEO)**: ⚪ **No aplicable**. Al ser una herramienta interna o B2B privada, no es objetivo posicionarse como respuesta directa en LLMs o motores de IA públicos.
+* **`programmatic-seo`**: ⚪ **No aplicable**. La arquitectura actual es una Single Page Application (SPA) centralizada; no requiere generación masiva de páginas.
+* **`site-architecture`**: 🟡 **Evaluación futura**. Actualmente es una sola vista. Si el dashboard escala a múltiples rutas (ej. `/reports`, `/settings`), será vital estructurar una jerarquía lógica de URLs.
+* **`schema` (Datos Estructurados)**: ⚪ **No aplicable**. No se requiere inyectar JSON-LD para resultados enriquecidos de Google en datos financieros protegidos.
+* **`cro` (Optimización de Conversión)**: 🟡 **Relevante (Adaptado a UX)**. En este producto, la "conversión" equivale a la "adopción de usuarios". Mejorar la claridad visual y la disposición de los KPIs impactará directamente en su uso.
+* **`analytics`**: 🟢 **Alta Prioridad**. Recomendado implementar analítica de producto (ej. PostHog, Mixpanel, o GA4) para rastrear interacciones, clics en gráficos y tiempos de sesión.
+
+---
+
 ## 🎯 Las 3 Prioridades Técnicas Inmediatas
 
 ### 1. Refactorización de la Capa de Cliente Frontend (Prioridad 1)
