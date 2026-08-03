@@ -137,6 +137,7 @@ function IncomeOutcomeChartComponent({ data, loading }: IncomeOutcomeChartProps)
           <>
             <div
               role="img"
+              tabIndex={0}
               aria-label="Line chart showing monthly income versus outcome over the selected period"
             >
               <ResponsiveContainer width="100%" height={280}>

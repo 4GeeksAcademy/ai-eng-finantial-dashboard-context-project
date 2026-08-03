@@ -132,6 +132,7 @@ function ProfitPercentChartComponent({ data, loading }: ProfitPercentChartProps)
           <>
             <div
               role="img"
+              tabIndex={0}
               aria-label="Line chart showing monthly profit margin as a percentage of income"
             >
               <ResponsiveContainer width="100%" height={280}>
