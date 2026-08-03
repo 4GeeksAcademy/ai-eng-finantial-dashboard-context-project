@@ -1,14 +1,26 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { KPIRow } from "@/components/dashboard/kpi-row";
-import { IncomeOutcomeChart } from "@/components/dashboard/income-outcome-chart";
-import { ProfitPercentChart } from "@/components/dashboard/profit-percent-chart";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   type FinancialMovement,
   type KPIMetrics,
   type MonthlyDataPoint,
 } from "@/lib/financial-types";
 import { computeKPIs, computeMonthlyData } from "@/lib/financial-utils";
+
+const IncomeOutcomeChart = lazy(() =>
+  import("@/components/dashboard/income-outcome-chart").then((m) => ({
+    default: m.IncomeOutcomeChart,
+  })),
+);
+
+const ProfitPercentChart = lazy(() =>
+  import("@/components/dashboard/profit-percent-chart").then((m) => ({
+    default: m.ProfitPercentChart,
+  })),
+);
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
 
@@ -18,6 +30,33 @@ async function fetchFinancialData(): Promise<FinancialMovement[]> {
     throw new Error(`Failed to fetch financial data: ${response.status}`);
   }
   return response.json();
+}
+
+function ChartSuspenseFallback() {
+  return (
+    <>
+      <Card className="border-border/60" role="status" aria-busy="true">
+        <span className="sr-only">Loading chart</span>
+        <CardHeader className="pb-4">
+          <Skeleton className="h-5 w-52" />
+          <Skeleton className="h-3 w-64 mt-1" />
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-[280px] w-full rounded-lg" />
+        </CardContent>
+      </Card>
+      <Card className="border-border/60" role="status" aria-busy="true">
+        <span className="sr-only">Loading chart</span>
+        <CardHeader className="pb-4">
+          <Skeleton className="h-5 w-52" />
+          <Skeleton className="h-3 w-64 mt-1" />
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-[280px] w-full rounded-lg" />
+        </CardContent>
+      </Card>
+    </>
+  );
 }
 
 function App() {
@@ -49,7 +88,11 @@ function App() {
           <DashboardHeader period="2024 - Full Year" />
 
           {error ? (
-            <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive-foreground">
+            <div
+              role="alert"
+              aria-live="assertive"
+              className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive-foreground"
+            >
               {error}
             </div>
           ) : null}
@@ -62,8 +105,10 @@ function App() {
             aria-label="Financial charts"
             className="grid grid-cols-1 gap-4 xl:grid-cols-2"
           >
-            <IncomeOutcomeChart data={monthlyData} loading={loading} />
-            <ProfitPercentChart data={monthlyData} loading={loading} />
+            <Suspense fallback={<ChartSuspenseFallback />}>
+              <IncomeOutcomeChart data={monthlyData} loading={loading} />
+              <ProfitPercentChart data={monthlyData} loading={loading} />
+            </Suspense>
           </section>
         </div>
       </div>

@@ -110,10 +110,18 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
+  }
+  :focus {
+    outline: none;
+  }
+  :focus-visible {
+    /* --ring is ~5:1 on dark background (WCAG 1.4.11 ≥ 3:1) */
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
   }
 }
 

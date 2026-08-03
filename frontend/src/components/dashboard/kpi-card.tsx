@@ -36,7 +36,8 @@ export function KPICard({ label, value, helperText, icon: Icon, variant, loading
 
   if (loading) {
     return (
-      <Card className="border-border/60">
+      <Card className="border-border/60" role="status" aria-busy="true">
+        <span className="sr-only">Loading {label}</span>
         <CardContent className="p-6 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <Skeleton className="h-4 w-28" />

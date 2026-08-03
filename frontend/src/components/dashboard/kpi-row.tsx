@@ -1,6 +1,8 @@
 import { KPICard } from './kpi-card'
 import { type KPIMetrics } from '@/lib/financial-types'
 import { formatCurrency, formatPercent } from '@/lib/financial-utils'
+// lucide-react deep per-icon paths have no .d.ts (strict TS). Vite has no
+// optimizePackageImports equivalent; named imports + sideEffects:false tree-shake in prod.
 import { TrendingUp, TrendingDown, DollarSign, BarChart2 } from 'lucide-react'
 
 interface KPIRowProps {
