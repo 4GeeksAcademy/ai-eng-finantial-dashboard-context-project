@@ -21,6 +21,9 @@ Este documento mantiene un registro cronológico de los hitos alcanzados, las ta
 - **Auditoría SEO (seo-audit)**:
   - Se evaluaron las áreas de la skill `seo-audit`, determinando que las tácticas de generación pública de SEO no aplican.
   - Se definieron como siguientes pasos estratégicos la implementación de **Analytics** y optimizaciones UX (**CRO**) orientadas a la adopción interna de la herramienta.
+- **Creación de Custom Skill (`financial-formatting`)**:
+  - Se diseñó y creó la skill personalizada en `.agents/skills/financial-formatting/SKILL.md` (aplicando el método de 3 expertos y refinamiento iterativo).
+  - Se ejecutó la auditoría con esta nueva skill, detectando y refactorizando la función `formatPercent` en `financial-utils.ts` para usar `Intl.NumberFormat` estandarizado en lugar de concatenación manual.
 
 ---
 

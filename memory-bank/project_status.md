@@ -72,6 +72,15 @@ Se analizó la sección `Related Skills` de la skill `seo-audit` para evaluar su
 
 ---
 
+## 💵 Auditoría de Custom Skill: Financial Formatting (`financial-formatting`)
+
+Se creó y ejecutó la skill personalizada `.agents/skills/financial-formatting/SKILL.md`:
+* **Prohibición de Concatenación Manual**: ✅ **Corregido**. Se detectó que `formatPercent` en `financial-utils.ts` utilizaba una plantilla de texto manual (`${value.toFixed(1)}%`). Se refactorizó para emplear `Intl.NumberFormat` con estilo porcentual.
+* **Internacionalización y Formato Monetario**: ✅ **Cumple**. Todas las llamadas a moneda usan `formatCurrency` basado en `Intl.NumberFormat("en-US", { style: "currency", currency: "USD" })`.
+* **Semántica de Color**: ✅ **Cumple**. Los componentes `<KPICard>` emplean clases de badge semánticamente diferenciadas por variante (`income`, `outcome`, `profit`).
+
+---
+
 ## 🎯 Las 3 Prioridades Técnicas Inmediatas
 
 ### 1. Refactorización de la Capa de Cliente Frontend (Prioridad 1)
