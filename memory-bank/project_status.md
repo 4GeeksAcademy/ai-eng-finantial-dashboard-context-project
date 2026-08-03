@@ -20,21 +20,43 @@ Este documento contiene la **radiografía del estado actual** del repositorio Fi
 
 | ID | Riesgo / Deuda Técnica | Componente Afectado | Nivel de Riesgo | Regla de Mitigación |
 | :--- | :--- | :--- | :--- | :--- |
-| **MP-01** | Regeneración redundante de 360 objetos mock en memoria por request | `backend/app/routes.py` | 🟡 Medio | `01-api-naming-conventions.md` |
-| **MP-02** | Periodo de fecha `"2024 - Full Year"` hardcodeado en la UI | `frontend/src/App.tsx` | 🔴 Alto | `02-frontend-structure.md` |
-| **MP-03** | Bloque `.catch()` genérico descartando la causa raíz de errores | `frontend/src/App.tsx` | 🔴 Alto | `03-error-handling.md` |
-| **MP-04** | Falta de `HTTPException` en backend ante fechas Query invertidas | `backend/app/routes.py` | 🟡 Medio | `03-error-handling.md` |
-| **MP-05** | `fetch` y `useEffect` directo en componente de vista principal | `frontend/src/App.tsx` | 🔴 Alto | `02-frontend-structure.md` |
+| **MP-01** | Regeneración redundante de 360 objetos mock en memoria por request (✅ Resuelto) | [`backend/app/routes.py`](file:///workspaces/ai-eng-financial-dashboard-context-project-matias-idiart-viera/backend/app/routes.py#L108-L110) | 🟢 Mitigado | `01-api-naming-conventions.md` |
+| **MP-02** | Periodo de fecha `"2024 - Full Year"` hardcodeado en la UI (✅ Resuelto) | [`frontend/src/App.tsx`](file:///workspaces/ai-eng-financial-dashboard-context-project-matias-idiart-viera/frontend/src/App.tsx#L55) | 🟢 Mitigado | `02-frontend-structure.md` |
+| **MP-03** | Bloque `.catch()` genérico descartando la causa raíz de errores (✅ Resuelto) | [`frontend/src/App.tsx`](file:///workspaces/ai-eng-financial-dashboard-context-project-matias-idiart-viera/frontend/src/App.tsx#L41) | 🟢 Mitigado | `03-error-handling.md` |
+| **MP-04** | Falta de `HTTPException` en backend ante fechas Query invertidas (✅ Resuelto) | [`backend/app/routes.py`](file:///workspaces/ai-eng-financial-dashboard-context-project-matias-idiart-viera/backend/app/routes.py#L83) | 🟢 Mitigado | `03-error-handling.md` |
+| **MP-05** | `fetch` y `useEffect` directo en componente de vista principal (✅ Resuelto) | [`frontend/src/App.tsx`](file:///workspaces/ai-eng-financial-dashboard-context-project-matias-idiart-viera/frontend/src/App.tsx#L18) | 🟢 Mitigado | `02-frontend-structure.md` |
 
 ---
 
 ## ✅ Mejoras Implementadas Recientemente
+
+* **Resolución de MP-04 (Excepciones HTTP Estructuradas en Backend)**:
+  - Se incorporó la validación estricta de rango de fechas `start_date <= end_date` lanzando `fastapi.HTTPException(status_code=400, detail="start_date must be before or equal to end_date")` en `backend/app/routes.py`.
+  - Se previnieron fallos 500 en tiempo de ejecución ante parámetros de consulta invertidos, cumpliendo con la Regla 03 (`03-error-handling.md`).
+  - Se incluyó la prueba unitaria `test_inverted_date_range_raises_http_400` en `backend/tests/test_routes.py`, alcanzando los 16 tests de `pytest` pasados al 100%.
+* **Resolución de MP-05 (Desacoplamiento de Capa Cliente Frontend - Prioridad 1)**:
+  - Se creó la capa de servicios HTTP aislada en `frontend/src/lib/services/financial-api.ts`.
+  - Se implementó el Custom Hook `useFinancialMetrics()` en `frontend/src/hooks/use-financial-metrics.ts` para encapsular la lógica de fetching, estados y manejo de ciclo de vida.
+  - Se refactorizó `App.tsx` liberándolo de efectos y llamadas de red directas, cumpliendo con la Regla 02 (`02-frontend-structure.md`).
+* **Resolución de MP-03 (Manejo Transparente de Errores en Frontend)**:
+  - Se refactorizó la extracción de errores HTTP en `App.tsx` extrayendo el atributo `detail` retornado por la API de FastAPI.
+  - Se agregó el registro de diagnóstico en consola (`console.error('[Financial Dashboard API Failure]:', err)`) en cumplimiento de la Regla 03 (`03-error-handling.md`).
+  - Se incluyó un botón de **Reintentar (Retry)** accesible en el banner de error de la UI para re-ejecutar la petición sin necesidad de recargar la página.
+
+* **Resolución de MP-01 (Caché Singleton y Módulo de Servicios en Backend - Prioridad 2)**:
+  - Se desacopló la generación de datos mock desde `routes.py` hacia un módulo de repositorio dedicado `backend/app/services/financial_repository.py`.
+  - Se implementó la función `get_cached_mock_movements()` utilizando el decorador `@lru_cache(maxsize=1)` para reusar el dataset precalculado en memoria en todos los endpoints de agregación (`/summary`, `/categories/top`, etc.), optimizando el consumo de CPU.
+
+* **Resolución de MP-02 (Periodo Dinámico en UI)**:
+  - Se implementó la función pura `computePeriodLabel(movements)` en `financial-utils.ts` para calcular dinámicamente el rango de años/periodos según las fechas reales obtenidas del backend.
+  - Se conectó el estado `period` en `App.tsx` pasando el valor calculado a `<DashboardHeader period={period} />`, eliminando el texto hardcodeado `"2024 - Full Year"`.
 
 * **Accesibilidad y Rendimiento (Vercel React Best Practices)**:
   - Se agregaron etiquetas `<meta description>` y `<title>` actualizados en `frontend/index.html` para SEO.
   - Se implementó *lazy loading* (`React.lazy` y `<Suspense>`) para los gráficos pesados de `recharts` en `App.tsx`, reduciendo el *bundle size* inicial.
   - Se integró un `AbortController` en el `useEffect` de carga de datos en `App.tsx` (optimizando las peticiones de cliente).
   - Se aplicó `aria-hidden="true"` a los iconos decorativos (`dashboard-header.tsx`, `kpi-card.tsx`) para mejorar la compatibilidad con lectores de pantalla.
+
   - **Auditoría WCAG 2.2**: Se ejecutó la skill `accessibility` generando un reporte (`accessibility_audit_report.md`) que confirma el cumplimiento en navegabilidad por teclado, contraste semántico y roles ARIA.
 
 ---

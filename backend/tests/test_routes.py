@@ -187,3 +187,12 @@ def test_metrics_alerts_returns_anomaly_candidates():
             "baseline_average",
             "increase_ratio",
         }
+
+
+def test_inverted_date_range_raises_http_400():
+    response = client.get(
+        "/api/metrics",
+        params={"start_date": "2025-12-31", "end_date": "2025-01-01"},
+    )
+    assert response.status_code == 400
+    assert response.json()["detail"] == "start_date must be before or equal to end_date"
