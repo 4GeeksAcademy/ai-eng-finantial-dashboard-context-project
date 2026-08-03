@@ -1,3 +1,6 @@
+// lucide-react deep per-icon paths (e.g. dist/esm/icons/...) have no .d.ts and break
+// strict TS. Vite has no Next.js optimizePackageImports equivalent; named barrel
+// imports stay, and sideEffects:false still allows production tree-shaking.
 import { LayoutDashboard } from 'lucide-react'
 
 interface DashboardHeaderProps {
