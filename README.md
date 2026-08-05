@@ -17,6 +17,39 @@ _Estas instrucciones están [disponibles en español](./README.es.md)._
 
 _Financial metrics dashboard with a React + TypeScript frontend and a FastAPI backend._
 
+## Required Project Features
+
+This project includes three required features that connect the dashboard UI with the backend metrics API.
+
+### 1. Date Range Filter
+
+- Adds a start and end date filter to dashboard views.
+- Dates use YYYY-MM-DD and both values are optional.
+- Supports all combinations:
+   - no dates: return all available data
+   - start only: filter from start date forward
+   - end only: filter up to end date
+   - both dates: filter between start and end
+- Uses backend date filters available on metrics endpoints such as /api/metrics, /api/metrics/summary, /api/metrics/categories/top, and /api/metrics/alerts.
+
+### 2. Anomaly Alerts Table
+
+- Displays anomaly alerts from /api/metrics/alerts.
+- Uses threshold to control sensitivity (API default is 0.3 when omitted).
+- Each alert row includes:
+   - period
+   - outcome_total
+   - baseline_average
+   - increase_ratio
+- baseline_average represents the cumulative average of all previous periods, not only the last three periods.
+
+### 3. B2B vs B2C Comparison View
+
+- Compares income-focused results for business types B2B and B2C.
+- Applies the same optional date range filters used in the rest of the dashboard.
+- Shows top categories and totals for each business type.
+- Uses backend endpoints /api/metrics/b2b and /api/metrics/b2c (with operation_type=income when needed for income-only comparisons).
+
 ## Recommended steps
 
 1. Fork this repository to your account.
