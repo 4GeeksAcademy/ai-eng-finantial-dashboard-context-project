@@ -4,18 +4,24 @@
 `memory-bank/`.
 
 **Justificación:** `AGENTS.md` instruye a cualquier agente a revisar
-`./.agents/rules`, `./.agents/skills` y `./memory-bank` antes de actuar. En este
-fork, comprobado directamente, solo `.agents/rules` existe; `.agents/skills` y
-`memory-bank/` todavía no se han creado. Esto es esperado según los "Recommended
-steps" del `README.md` (fork → inspeccionar → documentar reglas y memory bank),
-pero un agente que confíe ciegamente en `AGENTS.md` puede asumir que esas
-carpetas ya tienen contenido.
+`./.agents/rules`, `./.agents/skills` y `./memory-bank` antes de actuar. Estado
+actual, comprobado directamente: `.agents/rules/` existe (14 reglas + índice),
+`memory-bank/` existe (creado con `project-overview.md`, `decisions-and-fixes.md`,
+`conventions-and-rules.md`, `open-items.md`, `progress.md`); `.agents/skills/`
+**todavía no existe**. Un agente que confíe ciegamente en `AGENTS.md` sin
+comprobarlo puede asumir que `.agents/skills/` ya tiene contenido cuando no lo
+tiene.
 
 **Guía específica del proyecto:**
-- Antes de asumir que existen skills o memory bank, comprobarlo (`ls .agents/skills`,
-  `ls memory-bank`) en vez de fallar silenciosamente o inventar contenido.
-- Si se crea `.agents/skills/` o `memory-bank/`, actualizar esta regla (o
-  eliminarla) para reflejar el nuevo estado real del repo.
+- Antes de asumir que existen skills, comprobarlo (`ls .agents/skills`) en vez
+  de fallar silenciosamente o inventar contenido.
+- Antes de actuar, leer `memory-bank/` — ya contiene el estado sintetizado del
+  proyecto (arquitectura, decisiones y fixes ya aplicados, resultado de
+  validar las reglas, pendientes conocidos); evita redescubrir lo que ya está
+  documentado ahí.
+- Si se crea `.agents/skills/`, o si `memory-bank/` se reestructura de forma
+  incompatible con lo descrito aquí, actualizar esta regla para reflejar el
+  nuevo estado real del repo.
 - Cualquier regla nueva que se añada a `.agents/rules/` debe seguir el patrón de
   nombre de archivo descriptivo en kebab-case, como se usa en este mismo
   directorio.
