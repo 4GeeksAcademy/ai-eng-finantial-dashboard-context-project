@@ -1,8 +1,9 @@
 # docs/
 
 Fuente de verdad para verificar afirmaciones de API en cada spec de
-`specs/`. No se documenta a mano: se exporta directamente del backend para
-que nunca diverja de lo que la API realmente expone.
+`specs/` y en `frontend/specs/`. No se documenta a mano: se exporta
+directamente del backend para que nunca diverja de lo que la API
+realmente expone.
 
 ## `openapi.json`
 
