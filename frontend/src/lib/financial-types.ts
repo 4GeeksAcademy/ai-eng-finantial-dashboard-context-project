@@ -35,3 +35,9 @@ export interface MetricsAlert {
   baseline_average: number
   increase_ratio: number
 }
+
+export interface TopCategoryItem {
+  category: Category
+  operation_type: OperationType
+  total_amount: number
+}
