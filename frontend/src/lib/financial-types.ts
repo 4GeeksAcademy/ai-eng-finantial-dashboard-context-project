@@ -23,3 +23,8 @@ export interface MonthlyDataPoint {
   outcome: number
   profitPercent: number
 }
+
+export interface MetricsFacets {
+  min_date: string
+  max_date: string
+}
