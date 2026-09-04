@@ -28,3 +28,10 @@ export interface MetricsFacets {
   min_date: string
   max_date: string
 }
+
+export interface MetricsAlert {
+  period: string
+  outcome_total: number
+  baseline_average: number
+  increase_ratio: number
+}
