@@ -5,6 +5,8 @@ import { DateRangeFilter } from "@/components/dashboard/date-range-filter";
 import { KPIRow } from "@/components/dashboard/kpi-row";
 import { IncomeOutcomeChart } from "@/components/dashboard/income-outcome-chart";
 import { ProfitPercentChart } from "@/components/dashboard/profit-percent-chart";
+import { ComparisonView } from "@/components/comparison/comparison-view";
+import { ViewNav, type DashboardView } from "@/components/view-nav";
 import {
   type FinancialMovement,
   type KPIMetrics,
@@ -63,6 +65,8 @@ async function fetchMetricsAlerts(
 }
 
 function App() {
+  const [currentView, setCurrentView] = useState<DashboardView>("dashboard");
+
   const [metrics, setMetrics] = useState<KPIMetrics | null>(null);
   const [monthlyData, setMonthlyData] = useState<MonthlyDataPoint[]>([]);
   const [loading, setLoading] = useState(true);
@@ -166,45 +170,53 @@ function App() {
     <main className="dark min-h-screen bg-background text-foreground">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-8">
-          <DashboardHeader period="2024 - Full Year" />
+          <ViewNav currentView={currentView} onViewChange={setCurrentView} />
 
-          <DateRangeFilter
-            startDate={startDate}
-            endDate={endDate}
-            onStartDateChange={setStartDate}
-            onEndDateChange={setEndDate}
-            availableRange={availableRange}
-            errorMessage={dateRangeError}
-          />
+          {currentView === "dashboard" ? (
+            <>
+              <DashboardHeader period="2024 - Full Year" />
 
-          {error ? (
-            <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive-foreground">
-              {error}
-            </div>
-          ) : null}
+              <DateRangeFilter
+                startDate={startDate}
+                endDate={endDate}
+                onStartDateChange={setStartDate}
+                onEndDateChange={setEndDate}
+                availableRange={availableRange}
+                errorMessage={dateRangeError}
+              />
 
-          <section aria-label="Key performance indicators">
-            <KPIRow metrics={metrics} loading={showLoading} />
-          </section>
+              {error ? (
+                <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive-foreground">
+                  {error}
+                </div>
+              ) : null}
 
-          <section
-            aria-label="Financial charts"
-            className="grid grid-cols-1 gap-4 xl:grid-cols-2"
-          >
-            <IncomeOutcomeChart data={monthlyData} loading={showLoading} />
-            <ProfitPercentChart data={monthlyData} loading={showLoading} />
-          </section>
+              <section aria-label="Key performance indicators">
+                <KPIRow metrics={metrics} loading={showLoading} />
+              </section>
 
-          <section aria-label="Anomaly alerts">
-            <AnomalyAlertsTable
-              alerts={alerts}
-              threshold={threshold}
-              onThresholdChange={setThreshold}
-              thresholdError={thresholdError}
-              loading={showAlertsLoading}
-              error={alertsError}
-            />
-          </section>
+              <section
+                aria-label="Financial charts"
+                className="grid grid-cols-1 gap-4 xl:grid-cols-2"
+              >
+                <IncomeOutcomeChart data={monthlyData} loading={showLoading} />
+                <ProfitPercentChart data={monthlyData} loading={showLoading} />
+              </section>
+
+              <section aria-label="Anomaly alerts">
+                <AnomalyAlertsTable
+                  alerts={alerts}
+                  threshold={threshold}
+                  onThresholdChange={setThreshold}
+                  thresholdError={thresholdError}
+                  loading={showAlertsLoading}
+                  error={alertsError}
+                />
+              </section>
+            </>
+          ) : (
+            <ComparisonView availableRange={availableRange} />
+          )}
         </div>
       </div>
     </main>
