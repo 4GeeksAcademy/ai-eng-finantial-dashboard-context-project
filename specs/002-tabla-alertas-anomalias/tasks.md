@@ -86,8 +86,12 @@ T003 (tras T002) ─────┴───────────────
 
 ## Review checklist
 
-- [ ] Tareas revisadas y aprobadas
-- [ ] T001–T007 implementadas *(pendiente — no ejecutar sin decisión
-      explícita de pasar a fase de implementación)*
-- [ ] T008 verificación manual completada
-- [ ] T009 suite de tests en verde
+- [x] Tareas revisadas y aprobadas
+- [x] T001–T007 implementadas
+- [x] T008 verificación manual completada (backend uvicorn + `npm run dev`,
+      recorrido con Playwright: alertas por defecto, estado vacío al subir
+      el umbral, bloqueo por umbral inválido, e integración con el filtro
+      de fechas de la Funcionalidad 1 — resultados contrastados contra el
+      backend directamente)
+- [x] T009 suite de tests en verde (26/26, `npm test`), más `npm run lint`
+      y `npm run build` sin errores
