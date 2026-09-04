@@ -1,8 +1,9 @@
 # docs/
 
-Fuente de verdad para verificar afirmaciones de API en `frontend/specs/`.
-No se documenta a mano: se exporta directamente del backend para que
-nunca diverja de lo que la API realmente expone.
+Fuente de verdad para verificar afirmaciones de API en cada spec de
+`specs/` y en `frontend/specs/`. No se documenta a mano: se exporta
+directamente del backend para que nunca diverja de lo que la API
+realmente expone.
 
 ## `openapi.json`
 
@@ -11,8 +12,8 @@ construye a partir de los modelos Pydantic y las rutas de
 `backend/app/routes.py` — es el mismo esquema que sirve `/openapi.json` y
 alimenta `/docs` cuando el backend está corriendo).
 
-Regenerar tras cualquier cambio en `backend/app/routes.py` o
-`backend/app/main.py`:
+**Regenerar tras cualquier cambio en `backend/app/routes.py` o
+`backend/app/main.py`** (nuevo endpoint, campo, tipo, parámetro):
 
 ```bash
 cd backend

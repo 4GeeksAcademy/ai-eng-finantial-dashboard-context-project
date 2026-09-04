@@ -2,9 +2,15 @@ import { LayoutDashboard } from 'lucide-react'
 
 interface DashboardHeaderProps {
   period?: string
+  title?: string
+  subtitle?: string
 }
 
-export function DashboardHeader({ period = '2024 — Full Year' }: DashboardHeaderProps) {
+export function DashboardHeader({
+  period = '2024 — Full Year',
+  title = 'Financial Overview',
+  subtitle = 'Executive metrics dashboard',
+}: DashboardHeaderProps) {
   return (
     <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div className="flex items-center gap-3">
@@ -12,8 +18,8 @@ export function DashboardHeader({ period = '2024 — Full Year' }: DashboardHead
           <LayoutDashboard size={18} />
         </span>
         <div>
-          <h1 className="text-xl font-semibold text-foreground tracking-tight">Financial Overview</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">Executive metrics dashboard</p>
+          <h1 className="text-xl font-semibold text-foreground tracking-tight">{title}</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>
         </div>
       </div>
       <div className="flex items-center gap-2">
