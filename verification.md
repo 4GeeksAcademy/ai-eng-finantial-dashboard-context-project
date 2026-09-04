@@ -10,6 +10,7 @@ Registro de comprobaciones realizadas sobre el proyecto.
 - ✅ Se ha comprobado que el proyecto se ejecuta efectivamente con `docker compose up --build`.
 - ✅ Se ha creado `.agents/rules/` con reglas propuestas (arquitectura, naming, testing, documentación, DX/infra, código muerto, seguridad), cada una ligada a un hecho concreto del repo.
 - Se han probado las 14 reglas con un agente contra el repo: ✅ 12 con check verde, ❌ 1 con cruz roja, ⚠️ 1 con advertencia.
+- ✅ Se ha implementado y verificado el filtro de rango de fechas (`specs/001-filtro-rango-fechas/`): 15/15 tests, `lint`/`build` en verde, y comprobación manual en navegador (Playwright) de los 6 escenarios de aceptación, incluida la condición de carrera.
 
 ## Hallazgos
 
