@@ -15,7 +15,7 @@ API claims in this file are based on live OpenAPI served from /docs and /openapi
 - OpenAPI source (live): http://localhost:8000/openapi.json
 - Response types: [api-types.ts](api-types.ts)
 - Query parameter types: [param-types.ts](param-types.ts)
-- Component contracts: [components.ts](components.ts)
+- Component contracts: [components.md](components.md)
 
 ---
 
@@ -170,7 +170,7 @@ API claims in this file are based on live OpenAPI served from /docs and /openapi
 
 2. GET /api/metrics/categories/top
 - TS request type: TopCategoriesParams from [param-types.ts](param-types.ts)
-- For this functionality, each side query extends with business_type using BusinessSliceQuery from [components.ts](components.ts)
+- For this functionality, each side query extends with business_type using BusinessSliceQuery from [components.md](components.md)
 - Supported params:
   - operation_type?: "income" | "outcome"
   - limit?: number
