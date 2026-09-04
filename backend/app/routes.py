@@ -3,7 +3,7 @@ from __future__ import annotations
 import random
 from collections import defaultdict
 from datetime import date, timedelta
-from typing import Literal
+from typing import Literal, Optional
 
 from fastapi import APIRouter, Query
 from pydantic import BaseModel
@@ -52,7 +52,7 @@ class MetricsComparison(BaseModel):
     current_period: float
     previous_period: float
     delta_abs: float
-    delta_pct: float | None
+    delta_pct: Optional[float]
 
 
 class MetricsAlert(BaseModel):
@@ -91,7 +91,7 @@ def _build_movement(month: int, income_probability: float, today: date) -> Finan
     )
 
 
-def generate_mock_movements(seed: int | None = None) -> list[FinancialMovement]:
+def generate_mock_movements(seed: Optional[int] = None) -> list[FinancialMovement]:
     if seed is not None:
         random.seed(seed)
     today = date.today()
@@ -106,8 +106,8 @@ def generate_mock_movements(seed: int | None = None) -> list[FinancialMovement]:
 
 def filter_movements_by_date(
     movements: list[FinancialMovement],
-    start_date: date | None,
-    end_date: date | None,
+    start_date: Optional[date],
+    end_date: Optional[date],
 ) -> list[FinancialMovement]:
     if start_date is None and end_date is None:
         return movements
@@ -124,10 +124,10 @@ def filter_movements_by_date(
 
 def filter_movements(
     movements: list[FinancialMovement],
-    start_date: date | None,
-    end_date: date | None,
-    category: Category | None,
-    operation_type: OperationType | None,
+    start_date: Optional[date],
+    end_date: Optional[date],
+    category: Optional[Category],
+    operation_type: Optional[OperationType],
 ) -> list[FinancialMovement]:
     filtered = filter_movements_by_date(movements, start_date, end_date)
     if category is not None:
@@ -247,10 +247,10 @@ def health() -> dict[str, str]:
 
 @router.get("/api/metrics", response_model=list[FinancialMovement])
 def get_metrics(
-    start_date: date | None = Query(default=None),
-    end_date: date | None = Query(default=None),
-    category: Category | None = Query(default=None),
-    operation_type: OperationType | None = Query(default=None),
+    start_date: Optional[date] = Query(default=None),
+    end_date: Optional[date] = Query(default=None),
+    category: Optional[Category] = Query(default=None),
+    operation_type: Optional[OperationType] = Query(default=None),
 ) -> list[FinancialMovement]:
     movements = generate_mock_movements(seed=42)
     filtered = filter_movements(
@@ -268,11 +268,11 @@ def get_metrics_facets() -> MetricsFacets:
 @router.get("/api/metrics/summary", response_model=list[MetricsSummaryItem])
 def get_metrics_summary(
     group_by: GroupBy = Query(default="month"),
-    start_date: date | None = Query(default=None),
-    end_date: date | None = Query(default=None),
-    category: Category | None = Query(default=None),
-    operation_type: OperationType | None = Query(default=None),
-    business_type: BusinessType | None = Query(default=None),
+    start_date: Optional[date] = Query(default=None),
+    end_date: Optional[date] = Query(default=None),
+    category: Optional[Category] = Query(default=None),
+    operation_type: Optional[OperationType] = Query(default=None),
+    business_type: Optional[BusinessType] = Query(default=None),
 ) -> list[MetricsSummaryItem]:
     movements = generate_mock_movements(seed=42)
     if business_type is not None:
@@ -288,9 +288,9 @@ def get_metrics_summary(
 def get_top_categories(
     operation_type: OperationType = Query(default="outcome"),
     limit: int = Query(default=5, ge=1, le=20),
-    start_date: date | None = Query(default=None),
-    end_date: date | None = Query(default=None),
-    business_type: BusinessType | None = Query(default=None),
+    start_date: Optional[date] = Query(default=None),
+    end_date: Optional[date] = Query(default=None),
+    business_type: Optional[BusinessType] = Query(default=None),
 ) -> list[TopCategoryItem]:
     movements = generate_mock_movements(seed=42)
     if business_type is not None:
@@ -306,7 +306,7 @@ def get_top_categories(
 def get_metrics_comparison(
     start_date: date = Query(...),
     end_date: date = Query(...),
-    business_type: BusinessType | None = Query(default=None),
+    business_type: Optional[BusinessType] = Query(default=None),
 ) -> MetricsComparison:
     movements = generate_mock_movements(seed=42)
     if business_type is not None:
@@ -343,9 +343,9 @@ def get_metrics_comparison(
 def get_metrics_alerts(
     threshold: float = Query(default=0.3, ge=0),
     group_by: GroupBy = Query(default="month"),
-    start_date: date | None = Query(default=None),
-    end_date: date | None = Query(default=None),
-    business_type: BusinessType | None = Query(default=None),
+    start_date: Optional[date] = Query(default=None),
+    end_date: Optional[date] = Query(default=None),
+    business_type: Optional[BusinessType] = Query(default=None),
 ) -> list[MetricsAlert]:
     movements = generate_mock_movements(seed=42)
     if business_type is not None:
@@ -361,10 +361,10 @@ def get_metrics_alerts(
 
 @router.get("/api/metrics/b2b", response_model=list[FinancialMovement])
 def get_b2b_metrics(
-    start_date: date | None = Query(default=None),
-    end_date: date | None = Query(default=None),
-    category: Category | None = Query(default=None),
-    operation_type: OperationType | None = Query(default=None),
+    start_date: Optional[date] = Query(default=None),
+    end_date: Optional[date] = Query(default=None),
+    category: Optional[Category] = Query(default=None),
+    operation_type: Optional[OperationType] = Query(default=None),
 ) -> list[FinancialMovement]:
     movements = [
         movement for movement in generate_mock_movements(seed=42) if movement.business_type == "B2B"
@@ -377,10 +377,10 @@ def get_b2b_metrics(
 
 @router.get("/api/metrics/b2c", response_model=list[FinancialMovement])
 def get_b2c_metrics(
-    start_date: date | None = Query(default=None),
-    end_date: date | None = Query(default=None),
-    category: Category | None = Query(default=None),
-    operation_type: OperationType | None = Query(default=None),
+    start_date: Optional[date] = Query(default=None),
+    end_date: Optional[date] = Query(default=None),
+    category: Optional[Category] = Query(default=None),
+    operation_type: Optional[OperationType] = Query(default=None),
 ) -> list[FinancialMovement]:
     movements = [
         movement for movement in generate_mock_movements(seed=42) if movement.business_type == "B2C"
