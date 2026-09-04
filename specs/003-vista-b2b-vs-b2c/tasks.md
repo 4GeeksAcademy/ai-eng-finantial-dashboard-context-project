@@ -98,8 +98,13 @@ T005 ────────────┘
 
 ## Review checklist
 
-- [ ] Tareas revisadas y aprobadas
-- [ ] T001–T009 implementadas *(pendiente — no ejecutar sin decisión
-      explícita de pasar a fase de implementación)*
-- [ ] T010 verificación manual completada
-- [ ] T011 suite de tests en verde
+- [x] Tareas revisadas y aprobadas
+- [x] T001–T009 implementadas
+- [x] T010 verificación manual completada (backend uvicorn + `npm run dev`,
+      recorrido con Playwright: vista de comparación con 2 filas por tabla
+      —tal como predijo el spec—, filtro de fechas propio e independiente
+      del dashboard, bloqueo de rango inválido, y cambio de vista ida y
+      vuelta sin pérdida de estado ni errores de consola; datos
+      contrastados contra el backend)
+- [x] T011 suite de tests en verde (34/34, `npm test`), más `npm run lint`
+      y `npm run build` sin errores
