@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { AnomalyAlertsTable } from "@/components/dashboard/anomaly-alerts-table";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { DateRangeFilter } from "@/components/dashboard/date-range-filter";
 import { KPIRow } from "@/components/dashboard/kpi-row";
@@ -7,11 +8,16 @@ import { ProfitPercentChart } from "@/components/dashboard/profit-percent-chart"
 import {
   type FinancialMovement,
   type KPIMetrics,
+  type MetricsAlert,
   type MetricsFacets,
   type MonthlyDataPoint,
 } from "@/lib/financial-types";
 import { computeKPIs, computeMonthlyData } from "@/lib/financial-utils";
 import { buildMetricsQueryParams, isValidDateRange } from "@/lib/date-filter-utils";
+import {
+  buildAlertsQueryParams,
+  isValidThreshold,
+} from "@/lib/anomaly-threshold-utils";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
 
@@ -40,6 +46,22 @@ async function fetchMetricsFacets(): Promise<MetricsFacets> {
   return response.json();
 }
 
+async function fetchMetricsAlerts(
+  threshold: number,
+  startDate: string,
+  endDate: string,
+  signal: AbortSignal,
+): Promise<MetricsAlert[]> {
+  const params = buildAlertsQueryParams(threshold, startDate, endDate);
+  const response = await fetch(`${API_BASE_URL}/api/metrics/alerts?${params.toString()}`, {
+    signal,
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to fetch metrics alerts: ${response.status}`);
+  }
+  return response.json();
+}
+
 function App() {
   const [metrics, setMetrics] = useState<KPIMetrics | null>(null);
   const [monthlyData, setMonthlyData] = useState<MonthlyDataPoint[]>([]);
@@ -57,6 +79,16 @@ function App() {
   const dateRangeError = isRangeValid
     ? null
     : "The start date must be before or equal to the end date.";
+
+  const [threshold, setThreshold] = useState("0.3");
+  const [alerts, setAlerts] = useState<MetricsAlert[]>([]);
+  const [alertsLoading, setAlertsLoading] = useState(true);
+  const [alertsError, setAlertsError] = useState<string | null>(null);
+
+  const isThresholdValid = isValidThreshold(threshold);
+  const thresholdError = isThresholdValid
+    ? null
+    : "The threshold must be a number between 0.01 and 1.0.";
 
   useEffect(() => {
     fetchMetricsFacets()
@@ -99,7 +131,36 @@ function App() {
     };
   }, [startDate, endDate, isRangeValid]);
 
+  useEffect(() => {
+    if (!isThresholdValid || !isRangeValid) {
+      return;
+    }
+
+    const controller = new AbortController();
+    fetchMetricsAlerts(Number(threshold), startDate, endDate, controller.signal)
+      .then((data) => {
+        setAlerts(data);
+        setAlertsError(null);
+      })
+      .catch((err) => {
+        if (err instanceof DOMException && err.name === "AbortError") {
+          return;
+        }
+        setAlertsError("No se pudieron cargar las alertas de anomalias.");
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) {
+          setAlertsLoading(false);
+        }
+      });
+
+    return () => {
+      controller.abort();
+    };
+  }, [threshold, startDate, endDate, isThresholdValid, isRangeValid]);
+
   const showLoading = loading && isRangeValid;
+  const showAlertsLoading = alertsLoading && isThresholdValid && isRangeValid;
 
   return (
     <main className="dark min-h-screen bg-background text-foreground">
@@ -132,6 +193,17 @@ function App() {
           >
             <IncomeOutcomeChart data={monthlyData} loading={showLoading} />
             <ProfitPercentChart data={monthlyData} loading={showLoading} />
+          </section>
+
+          <section aria-label="Anomaly alerts">
+            <AnomalyAlertsTable
+              alerts={alerts}
+              threshold={threshold}
+              onThresholdChange={setThreshold}
+              thresholdError={thresholdError}
+              loading={showAlertsLoading}
+              error={alertsError}
+            />
           </section>
         </div>
       </div>
