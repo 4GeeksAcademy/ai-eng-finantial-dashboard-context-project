@@ -31,12 +31,21 @@ real de datos de la UI es el backend vía `/api/metrics`. No se ha decidido si
 eliminarlo o conectarlo a algo (tests, Storybook). Ver
 `.agents/rules/no-editar-mock-data-sin-confirmar-uso.md`.
 
-## CORS abierto
+## CORS abierto + cero autenticación en el backend
 
 `backend/app/main.py` tiene `allow_origins=["*"]` + `allow_credentials=True`.
 Funciona hoy porque no hay autenticación real; sería inválido/inseguro en
 cuanto se añadan cookies de sesión o tokens. Ver
 `.agents/rules/no-combinar-cors-wildcard-con-credenciales.md`.
+
+**Confirmado con evidencia adicional** (sesión `feature/agent-skills`, skill
+externa `igorwarzocha/opencode-workflows@security-fastapi`, descubierta con
+`npx skills find`): las **9 rutas de `backend/app/routes.py` no usan
+`Depends()`/`Security()` en ningún lado** — no es solo que CORS sea laxo,
+es que no hay ninguna capa de autenticación/autorización en el backend. No
+se implementó (cambio de alcance mayor, no pedido); queda documentado aquí
+para cuando se decida escalar el proyecto más allá de lo educativo, junto
+con `.agents/rules/revisar-npm-audit-antes-de-escalar.md`.
 
 ## Vulnerabilidades de npm — resuelto
 

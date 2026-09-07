@@ -101,7 +101,62 @@ pasó en una sesión posterior, rama `feature/agent-skills`.
     `feature/agent-skills` (uno por tipo/alcance en vez de uno mezclado —
     `fix(accesibilidad)`, `fix(seo)` ×2 en commits separados, `build(vite)`,
     `fix(deps)`, `chore(agents)`), pusheados a `origin`. PR todavía no
-    abierto.
+    abierto. Commit `7c14ef4` documentó todo lo anterior en `memory-bank/`.
+
+## Auditoría de cumplimiento contra un checklist externo
+
+17. El usuario pasó un checklist de evaluación de 8 puntos sobre este mismo
+    trabajo. Auditado punto por punto con evidencia (no de memoria);
+    resultado completo en el mensaje de esa sesión. Dos puntos requerían
+    corrección real, hechos en el momento:
+    - **Navegación por teclado nunca verificada en vivo** — Lighthouse
+      marca `focusable-controls`, `interactive-element-affordance`,
+      `focus-traps`, `managed-focus` y `use-landmarks` como
+      `scoreDisplayMode: "manual"` (no automatizables). Se instaló
+      `puppeteer-core` en el scratchpad y se apuntó al Chrome local
+      (`C:\Program Files\Google\Chrome\Application\chrome.exe`) para
+      pulsar Tab de verdad contra `localhost:5173` (docker-compose): Tab
+      recorre los 2 botones de `ViewNav`, los date-inputs (incluidos sus
+      subsegmentos nativos día/mes/año), las 2 regiones `role="application"`
+      de los gráficos (confirma que el `accessibilityLayer` de recharts las
+      hace navegables) y el input de umbral; Enter sobre "B2B vs B2C"
+      cambia la vista correctamente. Único hallazgo menor: el icono nativo
+      del date-picker de Chromium no muestra anillo de foco — es
+      comportamiento del user-agent (pseudo-elemento
+      `::-webkit-calendar-picker-indicator`), no controlable desde el CSS
+      de la app.
+    - **Nunca se había usado `npx skills find` para descubrir una skill**
+      — la tercera skill (`web-quality-audit`) se encontró leyendo las
+      referencias de otra, no por descubrimiento real. Se corrigió
+      corriendo `npx skills find "python fastapi security"` y aplicando
+      `igorwarzocha/opencode-workflows@security-fastapi` (justificación:
+      coincide con el gap de "backend sin auditar" ya señalado en esta
+      misma sesión). Su script `scripts/scan.sh` necesitaba `rg`
+      (no disponible en el shell), así que se replicó la misma lógica con
+      la herramienta Grep directamente contra `backend/`. Hallazgos reales:
+      **9 rutas en `backend/app/routes.py` sin `Depends()`/`Security()`**
+      (cero autenticación) y confirmación del CORS wildcard+credenciales de
+      `backend/app/main.py` que ya estaba en
+      `.agents/rules/no-combinar-cors-wildcard-con-credenciales.md`. No se
+      implementó un sistema de auth — sería un cambio de alcance mayor no
+      pedido; el propio proyecto documenta la ausencia de auth como estado
+      aceptado en esta etapa.
+    - Se reestructuró `.agents/skills/commit-profesional-es/SKILL.md`
+      (v1.0.0 → v1.1.0) para incluir secciones explícitas de **Objetivo,
+      Inputs, Outputs y Criterios de aceptación**, más una aclaración: el
+      prefijo del commit lo decide la naturaleza del cambio en el diff, no
+      "qué skill lo generó" — un fix encontrado por una skill de
+      rendimiento sigue siendo `fix`, no se agrupa por skill de origen.
+    - Dos puntos se dejaron como decisión del usuario, no resueltos
+      unilateralmente — **ambos confirmados explícitamente como "dejar como
+      está"**: (a) la ruta `.skills/` vs `.agents/skills/` (el checklist
+      pide literalmente `.skills/`, pero se mantiene solo en
+      `.agents/skills/`, coherente con "somos fieles al readme"); (b) no
+      reescribir el historial de `feature/agent-skills` para separar el fix
+      de contraste (hallado por `web-quality-audit`) del commit
+      `fix(accesibilidad)` (de la skill `accessibility`) donde quedó
+      mezclado — evita un `rebase -i` + force-push sobre una rama ya
+      compartida.
 
 **Rama actual**: `feature/agent-skills`, pusheada a `origin`, sin PR abierto
 todavía.
