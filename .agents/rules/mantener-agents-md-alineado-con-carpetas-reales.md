@@ -8,9 +8,11 @@
 actual, comprobado directamente: `.agents/rules/` existe (14 reglas + índice),
 `memory-bank/` existe (creado con `project-overview.md`, `decisions-and-fixes.md`,
 `conventions-and-rules.md`, `open-items.md`, `progress.md`); `.agents/skills/`
-**todavía no existe**. Un agente que confíe ciegamente en `AGENTS.md` sin
-comprobarlo puede asumir que `.agents/skills/` ya tiene contenido cuando no lo
-tiene.
+existe desde la rama `feature/agent-skills` con una skill propia
+(`commit-profesional-es/SKILL.md`, ver `memory-bank/progress.md`). Un agente
+que confíe ciegamente en `AGENTS.md` sin comprobar el contenido real de
+`.agents/skills/` puede asumir que hay más (o menos) skills de las que
+realmente existen.
 
 **Guía específica del proyecto:**
 - Antes de asumir que existen skills, comprobarlo (`ls .agents/skills`) en vez

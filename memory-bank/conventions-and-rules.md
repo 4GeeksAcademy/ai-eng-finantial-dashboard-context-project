@@ -25,6 +25,16 @@ correctamente** citando la regla exacta encontrada en `.agents/rules/`.
   producción importa, hay que pedirlo explícitamente o reforzar la redacción
   de la regla.
 
+  **Actualización** (sesión `feature/agent-skills`): esto se confirmó de
+  nuevo — tres skills externas de calidad frontend (accesibilidad,
+  rendimiento React, Lighthouse) se aplicaron sin que ninguna tocara
+  dependencias, hasta que se le pidió explícitamente al agente que
+  identificara un gap de cobertura. Ahí sí encontró y resolvió las 8
+  vulnerabilidades (`npm audit fix`, ver `decisions-and-fixes.md` #6 y
+  `open-items.md`). Refuerza la conclusión original: esta regla necesita que
+  alguien la invoque a propósito, no aparece sola en un flujo de trabajo
+  genérico.
+
 - **`no-editar-mock-data-sin-confirmar-uso.md`**: el agente sí hizo el paso de
   detección (comprobó con grep que `frontend/src/lib/mock-data.ts` no se
   importa en ningún sitio) pero **editó el archivo igualmente sin avisar**
