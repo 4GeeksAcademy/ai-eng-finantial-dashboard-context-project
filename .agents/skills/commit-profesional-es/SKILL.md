@@ -4,12 +4,51 @@ description: Redacta mensajes de commit profesionales en español siguiendo Conv
 license: MIT
 metadata:
   author: ai-eng-financial-dashboard-context-project
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Commit profesional en español
 
 Genera mensajes de commit siguiendo la especificación [Conventional Commits](https://www.conventionalcommits.org/es/), con la descripción redactada en español y el prefijo de tipo detectado automáticamente a partir de los cambios reales, no adivinado.
+
+## Objetivo
+
+Que cada commit de este repo (o de cualquier repo donde se use esta skill)
+tenga un mensaje que responda por sí solo a tres preguntas sin tener que
+abrir el diff: **qué tipo de cambio es** (prefijo Conventional Commits),
+**qué hace** (descripción en imperativo) y, cuando no sea obvio, **por qué**
+(cuerpo opcional). Sustituye la práctica de escribir el mensaje de memoria
+o a partir de lo que el usuario cree que hizo, por una lectura real del
+diff antes de redactar.
+
+## Inputs
+
+- El diff de lo que se va a commitear: `git diff --staged` (o `git diff` si
+  todavía no hay nada en stage). Es la única fuente de verdad — nunca el
+  resumen que da el usuario de memoria.
+- El historial reciente del repo (`git log --oneline -10`) para mantener el
+  mismo estilo de alcance/scope que ya se esté usando en el proyecto, si lo
+  hay.
+- Confirmación explícita del usuario de que se puede commitear (ver
+  Criterios de aceptación) — no es un input opcional, es obligatorio antes
+  de ejecutar `git commit`.
+
+## Outputs
+
+- Uno o más mensajes de commit en español, cada uno con el formato:
+  ```
+  <tipo>(<alcance opcional>): <descripción imperativa>
+
+  <cuerpo opcional>
+
+  <footer opcional>
+  ```
+- Si el diff mezcla tipos no relacionados, el output es una **propuesta de
+  división en varios commits** (uno por tipo/alcance), no un solo mensaje
+  forzado.
+- El propio commit ejecutado (`git commit -m "..."`) una vez el usuario
+  aprueba el mensaje — la skill no se limita a redactar texto, también
+  produce el commit real cuando se le pide "commitea esto" o equivalente.
 
 ## Cómo funciona
 
@@ -35,6 +74,15 @@ Genera mensajes de commit siguiendo la especificación [Conventional Commits](ht
 | `revert` | Revierte un commit anterior | Usa `revert: ` seguido del mensaje del commit revertido |
 
 Si el diff toca tanto código de producción como sus tests para la misma funcionalidad, usa el prefijo del cambio de producción (`feat`/`fix`/`refactor`/`perf`) — no `test`, salvo que el commit sea *solo* tests.
+
+**Una skill/herramienta aplicada no es en sí misma un tipo de commit.** El
+prefijo lo decide la naturaleza del cambio en el diff (¿es un fix?, ¿es
+seo?, ¿es build?), no "qué proceso lo generó". Si una misma pasada de
+trabajo produce cambios de naturaleza distinta (p. ej. una corrección de
+accesibilidad y, por separado, un ajuste de SEO), sigue el criterio de tipo
+de cambio del punto 2 de "Cómo funciona" y proponlos como commits
+separados — no los agrupes solo porque vinieron de la misma skill, ni los
+metas todos en un commit por skill si no comparten el mismo tipo de cambio.
 
 ## Formato del mensaje
 
@@ -88,6 +136,18 @@ Fixed the bug in the date filter
 feat: se añadió el nuevo componente de gráfico y también se corrigió un bug en el filtro de fechas que no validaba correctamente y se actualizó la documentación
 ```
 → Mezcla `feat` + `fix` + `docs` en un solo commit y mensaje; debería dividirse en tres commits.
+
+## Criterios de aceptación
+
+Un mensaje (o tanda de commits) generado por esta skill se considera
+correcto cuando:
+
+- [ ] El prefijo coincide con la tabla de decisión aplicada al diff real, no con una suposición.
+- [ ] Si el diff mezcla tipos de cambio no relacionados, se propuso dividir en varios commits en vez de forzar uno solo — y ningún commit resultante mezcla dos tipos distintos de cambio.
+- [ ] La descripción está en español, en modo imperativo, sin punto final, y no es genérica ("arreglos varios", "cambios menores").
+- [ ] El cuerpo (si existe) explica una decisión, causa raíz o contexto que el diff no deja claro por sí solo — no repite en prosa lo que ya se ve en el diff.
+- [ ] El usuario vio el mensaje propuesto y lo aprobó antes de que se ejecutara `git commit` (salvo autorización explícita previa de "commitea sin preguntar").
+- [ ] Si se hace push, es a la rama donde el usuario pidió trabajar — nunca a `main`/`master` sin que se haya pedido explícitamente.
 
 ## Nota sobre firmas/atribución automática
 
