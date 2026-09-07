@@ -81,3 +81,10 @@ This memory bank intentionally excludes:
 - speculative service integrations
 
 If a future change introduces a real database, external service, or new product requirement, that change must be evidenced in the repository before it is treated as established fact.
+
+## 6) Skills ecosystem memory
+
+This memory bank now tracks installed project skills, chosen ecosystem sources, and gap analysis:
+
+- [SKILLS-STATE.md](./SKILLS-STATE.md)
+- [../.skills/skills-gap-audit.md](../.skills/skills-gap-audit.md)
