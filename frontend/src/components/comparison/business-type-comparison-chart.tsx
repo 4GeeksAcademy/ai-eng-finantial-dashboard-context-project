@@ -51,13 +51,16 @@ export function BusinessTypeComparisonChart({
   return (
     <Card className="border-border/60">
       <CardHeader className="pb-4">
-        <CardTitle className="text-base font-semibold">B2B vs B2C Income</CardTitle>
+        <CardTitle id="business-type-comparison-chart-title" className="text-base font-semibold">
+          B2B vs B2C Income
+        </CardTitle>
         <CardDescription>Total income comparison between business lines</CardDescription>
       </CardHeader>
       <CardContent>
         {loading ? (
           <Skeleton className="h-[240px] w-full rounded-lg" />
         ) : (
+          <div role="group" aria-labelledby="business-type-comparison-chart-title">
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" strokeOpacity={0.6} />
@@ -81,6 +84,7 @@ export function BusinessTypeComparisonChart({
               </Bar>
             </BarChart>
           </ResponsiveContainer>
+          </div>
         )}
       </CardContent>
     </Card>

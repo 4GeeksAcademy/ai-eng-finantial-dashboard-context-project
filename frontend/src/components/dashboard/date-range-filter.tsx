@@ -27,6 +27,8 @@ export function DateRangeFilter({
             type="date"
             value={startDate}
             onChange={(event) => onStartDateChange(event.target.value)}
+            aria-invalid={errorMessage ? true : undefined}
+            aria-describedby={errorMessage ? 'date-range-error' : undefined}
             className="rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground"
           />
         </label>
@@ -36,6 +38,8 @@ export function DateRangeFilter({
             type="date"
             value={endDate}
             onChange={(event) => onEndDateChange(event.target.value)}
+            aria-invalid={errorMessage ? true : undefined}
+            aria-describedby={errorMessage ? 'date-range-error' : undefined}
             className="rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground"
           />
         </label>
@@ -48,7 +52,9 @@ export function DateRangeFilter({
           </span>
         ) : null}
         {errorMessage ? (
-          <span className="text-xs font-medium text-destructive">{errorMessage}</span>
+          <span id="date-range-error" role="alert" className="text-xs font-medium text-destructive">
+            {errorMessage}
+          </span>
         ) : null}
       </div>
     </section>

@@ -35,7 +35,7 @@ export function TopCategoriesTable({
         {loading ? (
           <Skeleton className="h-40 w-full rounded-lg" />
         ) : error ? (
-          <div className="flex h-40 items-center justify-center text-sm text-destructive">
+          <div role="alert" className="flex h-40 items-center justify-center text-sm text-destructive">
             {error}
           </div>
         ) : shares.length === 0 ? (
@@ -45,6 +45,7 @@ export function TopCategoriesTable({
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
+              <caption className="sr-only">Top income categories — {title}</caption>
               <thead>
                 <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
                   <th className="py-2 pr-4 font-medium">Category</th>
